@@ -1,18 +1,7 @@
-package main // mainパッケージであることを宣言
+package main 
 
-import (
-	"flag"
-	"fmt"
-    "strconv"
-)
+import "./crudego"
 
-func main() { // 最初に実行されるmain()関数を定義
-    flag.Parse()
-    var arg int
-    arg,_ = strconv.Atoi(flag.Arg(0))
-    fmt.Println(".intel_syntax noprefix")
-    fmt.Println(".global main")
-    fmt.Println("main:")
-    fmt.Printf("  mov rax, %d\n", arg)
-    fmt.Println("  ret")
+func main() { 
+    crudego.Handler()
 }
