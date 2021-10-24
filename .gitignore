@@ -1,0 +1,4 @@
+crude
+*.o
+tmp
+*.s
