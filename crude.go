@@ -1,7 +1,7 @@
-package main 
+package main
 
 import "./crudego"
 
-func main() { 
-    crudego.Handler()
+func main() {
+	crudego.Hoge()
 }
