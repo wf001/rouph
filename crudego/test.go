@@ -4,7 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"regexp"
+	"strconv"
 )
+
+var DEBUG bool = false
 
 type TokKind int
 
@@ -20,20 +23,32 @@ type Token struct {
 	val  string
 }
 
+func printToken(tok *Token) {
+	if DEBUG {
+
+		fmt.Println("==========================")
+		for ; tok != nil; tok = tok.next {
+			info("tok %p, ", tok)
+			info("%+v\n", tok)
+		}
+		fmt.Println("==========================")
+	}
+}
+func info(s string, v interface{}) {
+	if DEBUG {
+		fmt.Printf(s, v)
+	}
+}
+
 func newToken(kind TokKind, cur *Token, val string) *Token {
-	fmt.Printf("kind: %d, cur: %+v, val: %s\n", kind, cur, val)
+	info("kind: %d, ", kind)
+	info("cur: %+v, ", cur)
+	info("val: %s\n", val)
 	tok := new(Token)
 	tok.kind = kind
 	tok.val = val
 	cur.next = tok
 	return tok
-}
-func printToken(tok *Token) {
-	fmt.Println("==========================")
-	for ; tok != nil; tok = tok.next {
-        fmt.Printf("tok:%p, %+v\n", tok, tok)
-	}
-	fmt.Println("==========================")
 }
 func Hoge() {
 	flag.Parse()
@@ -57,5 +72,24 @@ func Hoge() {
 		}
 	}
 	cur = newToken(TK_KIND_EOF, cur, "")
-    printToken(head)
+	printToken(head)
+
+	fmt.Printf("  mov rax, %d\n", 0)
+	for e := head.next; e.next != nil; e = e.next {
+		info("e.val: %s\n", e.val)
+		if e.val == "+" {
+			e = e.next
+			fmt.Printf("  add rax, %s\n", e.val)
+			continue
+		} else if e.val == "-" {
+			e = e.next
+			fmt.Printf("  sub rax, %s\n", e.val)
+			continue
+		}
+		i, err := strconv.Atoi(e.val)
+		if err != nil {
+			panic("invalid")
+		}
+		fmt.Printf("  add rax, %d\n", i)
+	}
 }
