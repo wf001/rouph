@@ -1,7 +1,15 @@
 package main
 
-import "./crudego"
+import (
+	"./crudego"
+	"fmt"
+)
 
 func main() {
-	crudego.Hoge()
+	fmt.Println(".intel_syntax noprefix")
+	fmt.Println(".global main")
+	fmt.Println("main:")
+	head := crudego.TokenizeHandler()
+	crudego.Info("main head: %p\n", head)
+	fmt.Println("  ret")
 }

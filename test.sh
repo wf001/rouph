@@ -24,5 +24,6 @@ assert 3 '1+2'
 assert 4 '5-1'
 assert 6 '2+5-1'
 assert 6 '1+2+3'
+assert 41 " 12 + 34 - 5 "
 
 echo OK
