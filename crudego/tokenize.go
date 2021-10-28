@@ -110,23 +110,6 @@ func TokenizeHandler() *Token {
 		}
 	}
 	cur = newToken(TK_KIND_EOF, cur, "")
-	fmt.Printf("  mov rax, %d\n", 0)
-	//parsing
-	for e := head.Next; e.Next != nil; e = e.Next {
-		Info("e.val: '%s'\n", e.Val)
-		var op string
-		if e.Val == "+" {
-			e = e.Next
-			op = "  add rax "
-		} else if e.Val == "-" {
-			op = "  sub rax "
-			e = e.Next
-		} else {
-			op = "  add rax "
-		}
-		i := isNumber(e.Val)
-		fmt.Printf("  %s, %d\n", op, i)
-	}
 	printToken(head)
 
 	return head
@@ -175,6 +158,7 @@ func printNode(node *Node) {
 	}
 }
 func Expr(tok *Token) *Node {
+	var m_node *Node
 	Info("%s\n", "expr")
 	Info("%p\n", tok)
 	tok, node := mul(tok)
@@ -182,12 +166,12 @@ func Expr(tok *Token) *Node {
 		Info("%s\n", "expr for")
 		Info("%s\n", tok.Val)
 		if tok.Val == "+" {
-            tok = tok.Next
-			_, m_node := mul(tok)
+			tok = tok.Next
+			tok, m_node = mul(tok)
 			node = newNode(ND_KIND_ADD, node, m_node)
 		} else if tok.Val == "-" {
-            tok = tok.Next
-			_, m_node := mul(tok)
+			tok = tok.Next
+			tok, m_node = mul(tok)
 			node = newNode(ND_KIND_SUB, node, m_node)
 		} else {
 			Info("%s\n", "=================")
@@ -198,6 +182,7 @@ func Expr(tok *Token) *Node {
 	}
 }
 func mul(tok *Token) (*Token, *Node) {
+    var p_node *Node
 	Info("%s\n", "mul")
 	Info("%p\n", tok)
 	tok, node := primary(tok)
@@ -205,12 +190,12 @@ func mul(tok *Token) (*Token, *Node) {
 		Info("%s\n", "mul for")
 		Info("%s\n", tok.Val)
 		if tok.Val == "*" {
-            tok = tok.Next
-			_, p_node := primary(tok)
+			tok = tok.Next
+			tok, p_node = primary(tok)
 			node = newNode(ND_KIND_MUL, node, p_node)
 		} else if tok.Val == "/" {
-            tok = tok.Next
-			_, p_node := primary(tok)
+			tok = tok.Next
+			tok, p_node = primary(tok)
 			node = newNode(ND_KIND_DIV, node, p_node)
 		} else {
 			return tok, node
