@@ -3,11 +3,11 @@ package crudego
 import (
 	"flag"
 	"fmt"
+	"os"
 	"regexp"
 	"strconv"
+	"strings"
 )
-
-var DEBUG bool = true
 
 type TokKind int
 
@@ -50,9 +50,12 @@ func newToken(kind TokKind, cur *Token, val string) *Token {
 	cur.Next = tok
 	return tok
 }
-func TokenizeHandler() *Token{
+func TokenizeHandler() *Token {
 	flag.Parse()
 	arg := flag.Arg(0)
+	// space trim
+	arg = strings.Replace(arg, " ", "", -1)
+	// gen num arr
 	reg := "[+-]"
 	arg_arr := regexp.MustCompile(reg).Split(arg, -1)
 	cur_len := len(arg_arr[0])
@@ -64,6 +67,7 @@ func TokenizeHandler() *Token{
 
 	cur = newToken(TK_KIND_NUM, cur, arg_arr[0])
 
+	//tokenize
 	for _, s := range arg_arr[1:] {
 		if string(arg[cur_len]) == "+" || string(arg[cur_len]) == "-" {
 			cur = newToken(TK_KIND_RESERVED, cur, string(arg[cur_len]))
@@ -73,23 +77,31 @@ func TokenizeHandler() *Token{
 	}
 	cur = newToken(TK_KIND_EOF, cur, "")
 	fmt.Printf("  mov rax, %d\n", 0)
+	//parsing
 	for e := head.Next; e.Next != nil; e = e.Next {
 		Info("e.val: '%s'\n", e.Val)
+		var op string
 		if e.Val == "+" {
 			e = e.Next
-			fmt.Printf("  add rax, %s\n", e.Val)
-			continue
+			op = "  add rax "
 		} else if e.Val == "-" {
+			op = "  sub rax "
 			e = e.Next
-			fmt.Printf("  sub rax, %s\n", e.Val)
-			continue
+		} else {
+			op = "  add rax "
 		}
-		i, err := strconv.Atoi(e.Val)
-		if err != nil {
-			panic("invalid")
-		}
-		fmt.Printf("  add rax, %d\n", i)
+		i := isNumber(e.Val)
+		fmt.Printf("  %s, %d\n", op, i)
 	}
 
-    return  head
+	return head
+}
+
+func isNumber(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	return i
 }
