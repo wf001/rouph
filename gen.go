@@ -21,6 +21,13 @@ func gen(node *Node) {
 	case ND_KIND_SUB:
 		fmt.Printf("  sub rax, rdi\n")
 		break
+	case ND_KIND_MUL:
+		fmt.Printf("  imul rax, rdi\n")
+		break
+	case ND_KIND_DIV:
+		fmt.Printf("   cqo\n")
+		fmt.Printf("   idiv rdi\n")
+		break
 	}
 	fmt.Println("  push rax")
 }

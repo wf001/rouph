@@ -24,7 +24,6 @@ type Token struct {
 	Val  string
 }
 
-
 /*
 Token Func
 */
@@ -68,22 +67,18 @@ func TokenizeHandler() *Token {
 	arg = strings.Replace(arg, " ", "", -1)
 	// gen num arr
 	arg_arr := strTol(arg)
-	cur_len := len(arg_arr[0])
 
 	head := new(Token)
 	head.Next = nil
 	head.Kind = -1
 	cur := head
 
-	cur = newToken(TK_KIND_NUM, cur, arg_arr[0])
-
 	//tokenize
-	for _, s := range arg_arr[1:] {
-		op := string(arg[cur_len])
-		if op == "+" || op == "-" {
-			cur = newToken(TK_KIND_RESERVED, cur, string(arg[cur_len]))
+	for _, s := range arg_arr {
+		if strChr(s) {
+			cur = newToken(TK_KIND_RESERVED, cur, s)
+		} else {
 			cur = newToken(TK_KIND_NUM, cur, s)
-			cur_len += len(s) + 1
 		}
 	}
 	cur = newToken(TK_KIND_EOF, cur, "")
@@ -119,10 +114,13 @@ func strTol(input string) []string {
 				}
 				if strChr(string(input[i])) {
 					arr = append(arr, ai)
+					arr = append(arr, string(input[i]))
 					break
 				}
 				ai += string(input[i])
 			}
+		} else {
+			arr = append(arr, string(input[i]))
 		}
 		i += 1
 	}

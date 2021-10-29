@@ -6,7 +6,7 @@ import (
 func main() {
 	head := TokenizeHandler()
 	printToken(head)
-    node := Expr(head.Next)
+    _, node := Expr(head.Next)
 
 	Info("%s\n", "=================")
 	printNode(node)

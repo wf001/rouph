@@ -31,6 +31,9 @@ assert 4 '5-1'
 assert 6 '2+5-1'
 assert 6 '1+2+3'
 assert 41 " 12 + 34 - 5 "
+assert 6 "2*3 "
+assert 7 "2*3+1"
+assert 8 "(3-1)*4"
 
 rm -f tmp.s
 
