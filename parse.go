@@ -68,9 +68,6 @@ func Expr(tok *Token) *Node {
 			tok, m_node = mul(tok)
 			node = newNode(ND_KIND_SUB, node, m_node)
 		} else {
-			Info("%s\n", "=================")
-			printNode(node)
-			Info("%s\n", "=================")
 			return node
 		}
 	}

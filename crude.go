@@ -2,16 +2,20 @@ package main
 
 import (
 	"fmt"
-	"crude-lang-go/lib"
 )
-
 func main() {
+	head := TokenizeHandler()
+	printToken(head)
+    node := Expr(head.Next)
+
+	Info("%s\n", "=================")
+	printNode(node)
+	Info("%s\n", "=================")
+
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")
-	head := TokenizeHandler()
-    _ = Expr(head.Next)
-	Info("main head: %p\n", head)
+    gen(node)
+	fmt.Println("  pop rax")
 	fmt.Println("  ret")
-    lib.LibPrint()
 }
