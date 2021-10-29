@@ -22,6 +22,8 @@ type Token struct {
 	Kind TokKind
 	Next *Token
 	Val  string
+    str string
+    len int32
 }
 
 /*
@@ -104,6 +106,7 @@ func strTol(input string) []string {
 		if i == length {
 			return arr
 		}
+		// if input[i] is number
 		if !strChr(string(input[i])) {
 			ai := string(input[i])
 			for {
@@ -112,7 +115,13 @@ func strTol(input string) []string {
 					arr = append(arr, ai)
 					return arr
 				}
-				if strChr(string(input[i])) {
+                if sig, res := isEquOrRel(input[i:]); res {
+					arr = append(arr, ai)
+					arr = append(arr, sig)
+					ai = ""
+					i += 2
+					// if input[i] is reserved sign
+				} else if strChr(string(input[i])) {
 					arr = append(arr, ai)
 					arr = append(arr, string(input[i]))
 					break
@@ -129,4 +138,16 @@ func strTol(input string) []string {
 func strChr(s string) bool {
 	tgt := "+-*/()"
 	return strings.Contains(tgt, s)
+}
+
+func isEquOrRel(input string) (string, bool) {
+	v := []string{"==", "!=", ">=", "=<"}
+
+	for _, vi := range v {
+		if strings.HasPrefix(input, vi) {
+			return vi, true
+		}
+	}
+	return "", false
+
 }

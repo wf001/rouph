@@ -37,7 +37,7 @@ assert 8 "(3-1)*4"
 assert 4 "8/2"
 assert 4 "(3+5)/2"
 assert 8 " 24 - 20 + (6- 4)*2 "
-# Cant recieve '-' from cmd arg, but it works.
+# Skipped because Go flag.Parse Cant recieve '-' although it works.
 # assert -3 "-3"
 
 rm -f tmp.s
