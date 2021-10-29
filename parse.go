@@ -50,7 +50,7 @@ func printNode(node *Node) {
 		printNode(node.Rhs)
 	}
 }
-func Expr(tok *Token) (*Token,*Node) {
+func Expr(tok *Token) (*Token, *Node) {
 	var m_node *Node
 	Info("%s\n", "expr")
 	Info("%p\n", tok)
@@ -75,22 +75,34 @@ func mul(tok *Token) (*Token, *Node) {
 	var p_node *Node
 	Info("%s\n", "mul")
 	Info("%p\n", tok)
-	tok, node := primary(tok)
+	tok, node := unary(tok)
 	for {
 		Info("%s\n", "mul for")
 		Info("%s\n", tok.Val)
 		if tok.Val == "*" {
 			tok = tok.Next
-			tok, p_node = primary(tok)
+			tok, p_node = unary(tok)
 			node = newNode(ND_KIND_MUL, node, p_node)
 		} else if tok.Val == "/" {
 			tok = tok.Next
-			tok, p_node = primary(tok)
+			tok, p_node = unary(tok)
 			node = newNode(ND_KIND_DIV, node, p_node)
 		} else {
 			return tok, node
 		}
 	}
+}
+func unary(tok *Token) (*Token, *Node) {
+	var u_node *Node
+	if tok.Val == "+" {
+		tok = tok.Next
+		return primary(tok)
+	} else if tok.Val == "-" {
+		tok = tok.Next
+		tok, u_node = primary(tok)
+		return tok, newNode(ND_KIND_SUB, newNodeNum(0), u_node)
+	}
+	return primary(tok)
 }
 func primary(tok *Token) (*Token, *Node) {
 	Info("%s\n", "pri")
