@@ -1,16 +1,17 @@
 package main
 
 import (
-	"./crudego"
 	"fmt"
+	"crude-lang-go/lib"
 )
 
 func main() {
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")
-	head := crudego.TokenizeHandler()
-    _ = crudego.Expr(head.Next)
-	crudego.Info("main head: %p\n", head)
+	head := TokenizeHandler()
+    _ = Expr(head.Next)
+	Info("main head: %p\n", head)
 	fmt.Println("  ret")
+    lib.LibPrint()
 }

@@ -3,7 +3,7 @@ assert() {
   expected="$1"
   input="$2"
 
-  ./crude "$input" > tmp.s
+  ./crude-lang-go "$input" > tmp.s
   gcc -static -o tmp tmp.s
   ./tmp
   actual="$?"
@@ -16,7 +16,7 @@ assert() {
   fi
 }
 
-go build crude.go
+go build .
 
 assert 3 '3'
 assert 14 '14'
