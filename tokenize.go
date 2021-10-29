@@ -67,8 +67,7 @@ func TokenizeHandler() *Token {
 	// space trim
 	arg = strings.Replace(arg, " ", "", -1)
 	// gen num arr
-	reg := "[+-]"
-	arg_arr := regexp.MustCompile(reg).Split(arg, -1)
+	arg_arr := strTol(arg)
 	cur_len := len(arg_arr[0])
 
 	head := new(Token)
@@ -100,4 +99,36 @@ func isNumber(s string) int {
 		os.Exit(1)
 	}
 	return i
+}
+
+func strTol(input string) []string {
+	length := len(input)
+	i := 0
+	var arr []string
+	for {
+		if i == length {
+			return arr
+		}
+		if !strChr(string(input[i])) {
+			ai := string(input[i])
+			for {
+				i += 1
+				if i == length {
+					arr = append(arr, ai)
+					return arr
+				}
+				if strChr(string(input[i])) {
+					arr = append(arr, ai)
+					break
+				}
+				ai += string(input[i])
+			}
+		}
+		i += 1
+	}
+}
+
+func strChr(s string) bool {
+	tgt := "+-*/()"
+	return strings.Contains(tgt, s)
 }
