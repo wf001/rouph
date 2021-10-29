@@ -1,7 +1,7 @@
 package lib
 
 import (
-    "fmt"
+	"fmt"
 )
 
 func LibPrint() {
