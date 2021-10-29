@@ -17,7 +17,6 @@ type Node struct {
 	Val  int
 }
 
-
 /*
 Node Func
 */
@@ -51,7 +50,7 @@ func printNode(node *Node) {
 		printNode(node.Rhs)
 	}
 }
-func Expr(tok *Token) *Node {
+func Expr(tok *Token) (*Token,*Node) {
 	var m_node *Node
 	Info("%s\n", "expr")
 	Info("%p\n", tok)
@@ -68,12 +67,12 @@ func Expr(tok *Token) *Node {
 			tok, m_node = mul(tok)
 			node = newNode(ND_KIND_SUB, node, m_node)
 		} else {
-			return node
+			return tok, node
 		}
 	}
 }
 func mul(tok *Token) (*Token, *Node) {
-    var p_node *Node
+	var p_node *Node
 	Info("%s\n", "mul")
 	Info("%p\n", tok)
 	tok, node := primary(tok)
@@ -99,9 +98,10 @@ func primary(tok *Token) (*Token, *Node) {
 	Info("%s\n", tok.Val)
 	if tok.Val == "(" {
 		tok = tok.Next
-		node := Expr(tok)
+		tok, node := Expr(tok)
+		Info("'%s'", tok.Val)
 		if tok.Val != ")" {
-			panic("error")
+			panic("invalid closing.")
 		}
 		tok = tok.Next
 		return tok, node
