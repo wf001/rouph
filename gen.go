@@ -25,38 +25,38 @@ func gen(node *Node) {
 		fmt.Printf("  imul rax, rdi\n")
 		break
 	case ND_KIND_DIV:
-		fmt.Printf("   cqo\n")
-		fmt.Printf("   idiv rdi\n")
+		fmt.Printf("  cqo\n")
+		fmt.Printf("  idiv rdi\n")
 		break
 	case ND_KIND_EQ:
-		fmt.Printf("   cmp rax, rdi\n")
-		fmt.Printf("   sete al\n")
-		fmt.Printf("   movzb rax, al\n")
+		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  sete al\n")
+		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_NE:
-		fmt.Printf("   cmp rax, rdi\n")
-		fmt.Printf("   setne al\n")
-		fmt.Printf("   movzb rax, al\n")
+		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  setne al\n")
+		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_LT:
-		fmt.Printf("   cmp rax, rdi\n")
-		fmt.Printf("   setl al\n")
-		fmt.Printf("   movzb rax, al\n")
+		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  setl al\n")
+		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_LE:
-		fmt.Printf("   cmp rax, rdi\n")
-		fmt.Printf("   setle al\n")
-		fmt.Printf("   movzb rax, al\n")
+		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  setle al\n")
+		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_GT:
-		fmt.Printf("   cmp rax, rdi\n")
-		fmt.Printf("   setg al\n")
-		fmt.Printf("   movzb rax, al\n")
+		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  setg al\n")
+		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_GE:
-		fmt.Printf("   cmp rax, rdi\n")
-		fmt.Printf("   setge al\n")
-		fmt.Printf("   movzb rax, al\n")
+		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  setge al\n")
+		fmt.Printf("  movzb rax, al\n")
 		break
 	}
 	fmt.Println("  push rax")
