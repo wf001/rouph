@@ -12,12 +12,13 @@ import (
 
 var reserve_sig = []string{"return"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
-var op = "+-*/()><;"
+var op = "+-*/()><;="
 
 type TokKind int
 
 const (
 	TK_KIND_RESERVED TokKind = iota + 1
+	TK_IDENT
 	TK_KIND_NUM
 	TK_KIND_EOF
 )
@@ -26,7 +27,7 @@ type Token struct {
 	Kind TokKind
 	Next *Token
 	Val  string
-	str  string
+	Str  string
 }
 
 func printToken(tok *Token) {
@@ -55,7 +56,11 @@ func sep() {
 func newToken(kind TokKind, cur *Token, val string) *Token {
 	tok := new(Token)
 	tok.Kind = kind
-	tok.Val = val
+	if kind == TK_IDENT {
+		tok.Str = val
+	} else {
+		tok.Val = val
+	}
 	cur.Next = tok
 	return tok
 }
@@ -81,6 +86,8 @@ func TokenizeHandler() *Token {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
 		} else if s == "return" {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
+		} else if isAlpha(rune(s[0])) {
+			cur = newToken(TK_IDENT, cur, s)
 		} else {
 			cur = newToken(TK_KIND_NUM, cur, s)
 		}
@@ -116,6 +123,10 @@ func Scan(input string, i int, n int, arr []string, number string) []string {
 	} else if op, res := strChr(string(input[i])); res {
 		arr = appendIfExists(arr, number)
 		arr, number = append(arr, op), ""
+		i += 1
+		// otherwise, input[i] must be number
+	} else if isAlpha(rune(input[i])) {
+		arr, number = append(arr, string(input[i])), ""
 		i += 1
 		// otherwise, input[i] must be number
 	} else {

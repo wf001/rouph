@@ -88,6 +88,11 @@ assert 121 'return 121;144;169;'
 assert 3 '1+1;return 6/2;6-2;'
 assert 4 '1+1;6/2;return 6-2;'
 assert 4 ' return 6-2;'
+assert 100 'a=100;return a;'
+assert 10 'a=2;b=8;return a+b;'
+assert 4 'a=2;b=4;return b;'
+assert 9 'a=2;b=4;return ((a+b)/a)*((a+b)/a);'
+assert 7 'a=2;b=4;return (a/a+a)+b;'
 rm -f tmp.s
 
 echo $msg

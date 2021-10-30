@@ -4,6 +4,27 @@ import (
 	"fmt"
 )
 
+func genAddr(node *Node) {
+	if node.Kind == ND_KIND_LVAR {
+		offset := (rune(node.Name[0]) - rune('a') + 1) * 8
+		fmt.Printf("  lea rax, [rbp-%d]\n", offset)
+		fmt.Println("  push rax")
+        return
+	}
+    panic("not an local value.")
+}
+func load(){
+    fmt.Println("  pop rax")
+    fmt.Println("  mov rax, [rax]")
+    fmt.Println("  push rax")
+}
+func store(){
+    fmt.Println("  pop rdi")
+    fmt.Println("  pop rax")
+    fmt.Println("  mov [rax], rdi")
+    fmt.Println("  push rdi")
+}
+
 func gen(node *Node) {
 	switch node.Kind {
 	case ND_KIND_NUM:
@@ -13,10 +34,19 @@ func gen(node *Node) {
 		gen(node.Lhs)
 		fmt.Println("  add rsp, 8")
 		return
+    case ND_KIND_LVAR:
+        genAddr(node)
+        load()
+        return
+    case ND_KIND_ASSIGN:
+        genAddr(node.Lhs)
+        gen(node.Rhs)
+        store()
+        return
 	case ND_KIND_RETURN:
 		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
-		fmt.Printf("  ret\n")
+		fmt.Printf("  jmp .Lreturn\n")
 		return
 	}
 	gen(node.Lhs)
@@ -77,10 +107,16 @@ func codegen(node *Node) {
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")
+    fmt.Println("  push rbp")
+    fmt.Println("  mov rbp, rsp")
+    fmt.Println("  sub rsp, 208")
 	Info("%+v\n", node.Next)
 
 	for ; node != nil; node = node.Next {
 		gen(node)
 	}
+    fmt.Println(".Lreturn:")
+    fmt.Println("  mov rsp, rbp")
+    fmt.Println("  pop rbp")
 	fmt.Println("  ret")
 }
