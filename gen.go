@@ -65,9 +65,11 @@ func codegen(node *Node) {
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")
+    Info("%+v\n", node.Next)
 
-	gen(node)
-
-	fmt.Println("  pop rax")
+	for ; node != nil; node = node.Next {
+		gen(node)
+		fmt.Println("  pop rax")
+	}
 	fmt.Println("  ret")
 }
