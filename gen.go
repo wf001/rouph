@@ -63,6 +63,7 @@ func gen(node *Node) {
 }
 func codegen(node *Node) {
 	Info("%s\n","---------------------- instruction ---------------")
+	Info("%s\n","")
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")

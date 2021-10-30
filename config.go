@@ -1,3 +1,3 @@
 package main
 
-var DEBUG bool = false
+var DEBUG bool = true

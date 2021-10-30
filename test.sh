@@ -11,9 +11,9 @@ assert() {
   code=0
 
   if [ "$actual" = "$expected" ]; then
-    echo -e "\e[1;32mPASSED\e[0m : $input => $actual"
+    echo -e "\e[1;32mPASSED\e[0m : '$input' => $actual"
   else
-    echo -e "\e[1;31mFAILED\e[0m : $input => $expected expected, but got $actual"
+    echo -e "\e[1;31mFAILED\e[0m : '$input' => $expected expected, but got $actual"
     msg="NG"
     code=-1
   fi
@@ -37,6 +37,7 @@ assert 8 '(3-1)*4;'
 assert 4 '8/2;'
 assert 4 '(3+5)/2;'
 assert 8 ' 24 - 20 + (6- 4)*2;'
+assert 8 '  24 -20 + ( 6- 4)*2 ;'
 # Skipped because Go flag.Parse Cant recieve '-' although it works.
 # assert -3 '-3'
 assert 1 '1==1;'
