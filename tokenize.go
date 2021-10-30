@@ -12,6 +12,9 @@ import (
 
 type TokKind int
 
+var v_eq_rel = []string{"==", "!=", ">=", "=<"}
+var v_reserve = []string{"return"}
+
 const (
 	TK_KIND_RESERVED TokKind = iota + 1
 	TK_KIND_NUM
@@ -73,8 +76,12 @@ func TokenizeHandler() *Token {
 	cur := head
 
 	//tokenize
+	Info("arg_arr:%+v\n", arg_arr)
 	for _, s := range arg_arr {
+		Info("%s\n", s)
 		if _, res := strChr(s); res {
+			cur = newToken(TK_KIND_RESERVED, cur, s)
+		} else if s == "return" {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
 		} else {
 			cur = newToken(TK_KIND_NUM, cur, s)
@@ -90,24 +97,28 @@ func Scan(input string, i int, n int, arr []string, number string) []string {
 		arr = appendIfExists(arr, number)
 		return arr
 	}
-    if string(input[i]) == " " {
+	Info("Scan %s\n", string(input[i:]))
+	// if input[i] is space, it skipped
+	if string(input[i]) == " " {
 		arr = appendIfExists(arr, number)
-        number = ""
+		number = ""
 		i += 1
-	    return Scan(input, i, n, arr, number)
-    }
-	// if input[i] equ or rel
-	v := []string{"==", "!=", ">=", "=<", "return"}
-	if sig, res := startWith(string(input[i:]), v); res {
+		// if input[i] is reserved signature
+	} else if sig, res := startWith(string(input[i:]), v_reserve); res && !isAlphaNum(rune(input[i+6])) {
 		arr = appendIfExists(arr, number)
 		arr, number = append(arr, sig), ""
-		i += len(sig)
-		// if input[i] is other reserved
+		i += 6
+		// if input[i] is Equality or Relational operator
+	} else if sig, res := startWith(string(input[i:]), v_eq_rel); res {
+		arr = appendIfExists(arr, number)
+		arr, number = append(arr, sig), ""
+		i += 2
+		// if input[i] is binary operator
 	} else if sig, res := strChr(string(input[i])); res {
 		arr = appendIfExists(arr, number)
 		arr, number = append(arr, sig), ""
 		i += 1
-		// if input[i] is number
+		// otherwise, input[i] must be number
 	} else {
 		number += string(input[i])
 		_ = isNumber(number)
@@ -133,7 +144,6 @@ func strChr(input string) (string, bool) {
 }
 
 func startWith(input string, v []string) (string, bool) {
-
 	for _, vi := range v {
 		if strings.HasPrefix(input, vi) {
 			return vi, true
@@ -149,4 +159,14 @@ func isNumber(s string) int {
 		os.Exit(1)
 	}
 	return i
+}
+func isAlpha(c rune) bool {
+	return (rune('a') <= c && c <= rune('z')) ||
+		(rune('A') <= c && c <= rune('Z') || c == rune('_'))
+}
+func isAlphaNum(c rune) bool {
+    res := isAlpha(c) || (rune('0') <= c && c <= rune('9'))
+    Info("isAlphaNum:%d\n", res)
+    Info("c:%s\n", string(c))
+    return res
 }
