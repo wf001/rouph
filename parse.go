@@ -44,6 +44,7 @@ func newNodeNum(val int) *Node {
 
 func printNode(node *Node) {
 	if DEBUG {
+		Info("%s\n", "### print node ###")
 		if node.Kind == ND_KIND_NUM {
 			Info("## node %p\n", node)
 			Info("## %+v\n", node)

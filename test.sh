@@ -87,6 +87,7 @@ assert 1 'return (4-1)>=(5-2);'
 assert 121 'return 121;144;169;'
 assert 3 '1+1;return 6/2;6-2;'
 assert 4 '1+1;6/2;return 6-2;'
+assert 4 ' return 6-2;'
 rm -f tmp.s
 
 echo $msg
