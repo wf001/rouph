@@ -66,7 +66,7 @@ func TokenizeHandler() *Token {
 	Info("arg:%s\n", arg)
 	// gen num arr
 	var arg_arr []string
-	arg_arr = f(arg, 0, len(arg), arg_arr, "")
+	arg_arr = Scan(arg, 0, len(arg), arg_arr, "")
 
 	head := new(Token)
 	head.Next = nil
@@ -131,7 +131,7 @@ func strTol(input string) []string {
 		i += 1
 	}
 }
-func f(input string, i int, n int, arr []string, number string) []string {
+func Scan(input string, i int, n int, arr []string, number string) []string {
 	if i == n {
 		if len(number) > 0 {
 			arr = append(arr, number)
@@ -143,17 +143,17 @@ func f(input string, i int, n int, arr []string, number string) []string {
 		if len(number) > 0 {
 			arr = append(arr, number)
 		}
-		return f(input, i+2, n, append(arr, sig), "")
+		return Scan(input, i+2, n, append(arr, sig), "")
 		// if input[i] is other reserved
 	} else if sig, res := strChr(string(input[i])); res {
 		if len(number) > 0 {
 			arr = append(arr, number)
 		}
-		return f(input, i+1, n, append(arr, sig), "")
+		return Scan(input, i+1, n, append(arr, sig), "")
 		// if input[i] is number
 	} else {
 		number += string(input[i])
-		return f(input, i+1, n, arr, number)
+		return Scan(input, i+1, n, arr, number)
 	}
 }
 func strChr(input string) (string, bool) {

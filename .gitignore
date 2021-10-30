@@ -1,4 +1,5 @@
 crude
+crude-lang-go
 *.o
 tmp
 *.s
