@@ -18,6 +18,7 @@ const (
 
 type Node struct {
 	Kind NodeKind
+	Next *Node
 	Lhs  *Node
 	Rhs  *Node
 	Val  int
@@ -43,17 +44,38 @@ func newNodeNum(val int) *Node {
 func printNode(node *Node) {
 	if DEBUG {
 		if node.Kind == ND_KIND_NUM {
-			Info("node %p\n", node)
-			Info("%+v\n", node)
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
 			return
 		}
-		Info("node %p\n", node)
-		Info("%+v\n", node)
+		Info("## node %p\n", node)
+		Info("## %+v\n", node)
 		printNode(node.Lhs)
 		printNode(node.Rhs)
 	}
 }
-func Expr(tok *Token) (*Token, *Node) {
+func Program(tok *Token) (*Token, *Node) {
+	head := new(Node)
+	head.Next = nil
+	cur := head
+	for {
+		if tok.Kind == TK_KIND_EOF {
+			break
+		}
+		tok, cur.Next = stmt(tok)
+		cur = cur.Next
+	}
+	return tok, head.Next
+}
+func stmt(tok *Token) (*Token, *Node) {
+	tok, node := expr(tok)
+	if tok.Val != ";" {
+		panic("; not found")
+	}
+	tok = tok.Next
+	return tok, node
+}
+func expr(tok *Token) (*Token, *Node) {
 	return equality(tok)
 }
 func equality(tok *Token) (*Token, *Node) {
@@ -167,7 +189,7 @@ func primary(tok *Token) (*Token, *Node) {
 	Info("%s\n", tok.Val)
 	if tok.Val == "(" {
 		tok = tok.Next
-		tok, node := Expr(tok)
+		tok, node := expr(tok)
 		Info("'%s'", tok.Val)
 		if tok.Val != ")" {
 			panic("invalid closing.")

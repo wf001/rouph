@@ -62,12 +62,14 @@ func gen(node *Node) {
 	fmt.Println("  push rax")
 }
 func codegen(node *Node) {
+	Info("%s\n","---------------------- instruction ---------------")
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")
 
-	gen(node)
-
-	fmt.Println("  pop rax")
+	for ; node != nil; node = node.Next {
+		gen(node)
+		fmt.Println("  pop rax")
+	}
 	fmt.Println("  ret")
 }
