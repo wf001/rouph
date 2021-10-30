@@ -8,6 +8,12 @@ const (
 	ND_KIND_MUL
 	ND_KIND_DIV
 	ND_KIND_NUM
+	ND_KIND_EQ
+	ND_KIND_NE
+	ND_KIND_LT // <
+	ND_KIND_LE // =<
+	ND_KIND_GT // >
+	ND_KIND_GE // >=
 )
 
 type Node struct {
@@ -51,6 +57,60 @@ func printNode(node *Node) {
 	}
 }
 func Expr(tok *Token) (*Token, *Node) {
+    return equality(tok)
+}
+func equality(tok *Token) (*Token, *Node) {
+	var m_node *Node
+	Info("%s\n", "eq")
+	Info("%p\n", tok)
+	tok, node := relational(tok)
+	for {
+		Info("%s\n", "eq for")
+		Info("%s\n", tok.Val)
+		if tok.Val == "==" {
+			tok = tok.Next
+			tok, m_node = relational(tok)
+			node = newNode(ND_KIND_EQ, node, m_node)
+		} else if tok.Val == "!=" {
+			tok = tok.Next
+			tok, m_node = relational(tok)
+			node = newNode(ND_KIND_NE, node, m_node)
+		} else {
+			return tok, node
+		}
+	}
+}
+func relational(tok *Token) (*Token, *Node) {
+	var m_node *Node
+	Info("%s\n", "rel")
+	Info("%p\n", tok)
+	tok, node := add(tok)
+	for {
+		Info("%s\n", "rel for")
+		Info("%s\n", tok.Val)
+		if tok.Val == "<" {
+			tok = tok.Next
+			tok, m_node = add(tok)
+			node = newNode(ND_KIND_LT, node, m_node)
+		} else if tok.Val == "=<" {
+			tok = tok.Next
+			tok, m_node = add(tok)
+			node = newNode(ND_KIND_LE, node, m_node)
+		} else if tok.Val == ">" {
+			tok = tok.Next
+			tok, m_node = add(tok)
+			node = newNode(ND_KIND_GT, node, m_node)
+		} else if tok.Val == ">=" {
+			tok = tok.Next
+			tok, m_node = add(tok)
+			node = newNode(ND_KIND_GE, node, m_node)
+		} else {
+			return tok, node
+		}
+	}
+}
+
+func add(tok *Token) (*Token, *Node){
 	var m_node *Node
 	Info("%s\n", "expr")
 	Info("%p\n", tok)
