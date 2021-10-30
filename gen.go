@@ -5,11 +5,15 @@ import (
 )
 
 func gen(node *Node) {
-	if node.Kind == ND_KIND_NUM {
+	switch node.Kind {
+	case ND_KIND_NUM:
 		fmt.Printf("  push %d\n", node.Val)
 		return
-	}
-	if node.Kind == ND_KIND_RETURN {
+	case ND_KIND_EXPR_STMT:
+		gen(node.Lhs)
+		fmt.Println("  add rsp, 8")
+		return
+	case ND_KIND_RETURN:
 		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
 		fmt.Printf("  ret\n")
@@ -73,11 +77,10 @@ func codegen(node *Node) {
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")
-    Info("%+v\n", node.Next)
+	Info("%+v\n", node.Next)
 
 	for ; node != nil; node = node.Next {
 		gen(node)
-		fmt.Println("  pop rax")
 	}
 	fmt.Println("  ret")
 }
