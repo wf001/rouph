@@ -7,7 +7,6 @@ const (
 	ND_KIND_SUB
 	ND_KIND_MUL
 	ND_KIND_DIV
-	ND_KIND_NUM
 	ND_KIND_EQ
 	ND_KIND_NE
 	ND_KIND_LT     // <
@@ -15,6 +14,7 @@ const (
 	ND_KIND_GT     // >
 	ND_KIND_GE     // >=
 	ND_KIND_RETURN // return
+	ND_KIND_NUM
 )
 
 type Node struct {

@@ -10,7 +10,7 @@ func gen(node *Node) {
 		return
 	}
 	if node.Kind == ND_KIND_RETURN {
-        gen(node.Lhs)
+		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
 		fmt.Printf("  ret\n")
 		return
@@ -68,8 +68,8 @@ func gen(node *Node) {
 	fmt.Println("  push rax")
 }
 func codegen(node *Node) {
-	Info("%s\n","---------------------- instruction ---------------")
-	Info("%s\n","")
+	Info("%s\n", "---------------------- instruction ---------------")
+	Info("%s\n", "")
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")

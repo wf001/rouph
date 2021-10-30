@@ -10,10 +10,11 @@ import (
 	"strings"
 )
 
-type TokKind int
+var reserve_sig = []string{"return"}
+var eq_rel_op = []string{"==", "!=", ">=", "=<"}
+var op = "+-*/()><;"
 
-var v_eq_rel = []string{"==", "!=", ">=", "=<"}
-var v_reserve = []string{"return"}
+type TokKind int
 
 const (
 	TK_KIND_RESERVED TokKind = iota + 1
@@ -28,9 +29,6 @@ type Token struct {
 	str  string
 }
 
-/*
-Token Func
-*/
 func printToken(tok *Token) {
 	if DEBUG {
 		fmt.Println("============= print token =============")
@@ -104,19 +102,20 @@ func Scan(input string, i int, n int, arr []string, number string) []string {
 		number = ""
 		i += 1
 		// if input[i] is reserved signature
-	} else if sig, res := startWith(string(input[i:]), v_reserve); res && !isAlphaNum(rune(input[i+6])) {
+	} else if sig, res := startWith(string(input[i:]), reserve_sig); res &&
+		!isAlphaNum(rune(input[i+6])) {
 		arr = appendIfExists(arr, number)
 		arr, number = append(arr, sig), ""
 		i += 6
 		// if input[i] is Equality or Relational operator
-	} else if sig, res := startWith(string(input[i:]), v_eq_rel); res {
+	} else if op, res := startWith(string(input[i:]), eq_rel_op); res {
 		arr = appendIfExists(arr, number)
-		arr, number = append(arr, sig), ""
+		arr, number = append(arr, op), ""
 		i += 2
 		// if input[i] is binary operator
-	} else if sig, res := strChr(string(input[i])); res {
+	} else if op, res := strChr(string(input[i])); res {
 		arr = appendIfExists(arr, number)
-		arr, number = append(arr, sig), ""
+		arr, number = append(arr, op), ""
 		i += 1
 		// otherwise, input[i] must be number
 	} else {
@@ -133,9 +132,8 @@ func appendIfExists(arr []string, number string) []string {
 	return arr
 }
 func strChr(input string) (string, bool) {
-	v := "+-*/()><;"
 
-	for _, vi := range v {
+	for _, vi := range op {
 		if string(input[0]) == string(vi) {
 			return string(vi), true
 		}
@@ -165,8 +163,8 @@ func isAlpha(c rune) bool {
 		(rune('A') <= c && c <= rune('Z') || c == rune('_'))
 }
 func isAlphaNum(c rune) bool {
-    res := isAlpha(c) || (rune('0') <= c && c <= rune('9'))
-    Info("isAlphaNum:%d\n", res)
-    Info("c:%s\n", string(c))
-    return res
+	res := isAlpha(c) || (rune('0') <= c && c <= rune('9'))
+	Info("isAlphaNum:%d\n", res)
+	Info("c:%s\n", string(c))
+	return res
 }
