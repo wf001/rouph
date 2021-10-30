@@ -3,18 +3,19 @@ package main
 type NodeKind int
 
 const (
-	ND_KIND_ADD NodeKind = iota + 1
-	ND_KIND_SUB
-	ND_KIND_MUL
-	ND_KIND_DIV
-	ND_KIND_EQ
-	ND_KIND_NE
-	ND_KIND_LT     // <
-	ND_KIND_LE     // =<
-	ND_KIND_GT     // >
-	ND_KIND_GE     // >=
-	ND_KIND_RETURN // return
-	ND_KIND_NUM
+	ND_KIND_ADD       NodeKind = iota + 1 // +
+	ND_KIND_SUB                           // -
+	ND_KIND_MUL                           // *
+	ND_KIND_DIV                           // /
+	ND_KIND_EQ                            // ==
+	ND_KIND_NE                            // !=
+	ND_KIND_LT                            // <
+	ND_KIND_LE                            // =<
+	ND_KIND_GT                            // >
+	ND_KIND_GE                            // >=
+	ND_KIND_RETURN                        // return
+	ND_KIND_EXPR_STMT                     // Expression Statement
+	ND_KIND_NUM                           // Integer
 )
 
 type Node struct {
@@ -88,7 +89,9 @@ func stmt(tok *Token) (*Token, *Node) {
 		return tok, node
 	}
 
-	tok, node := expr(tok)
+	tok, e_node := expr(tok)
+    node := newNode(ND_KIND_EXPR_STMT, e_node, nil)
+
 	if tok.Val != ";" {
 		panic("; not found")
 	}
