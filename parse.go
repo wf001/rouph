@@ -10,10 +10,11 @@ const (
 	ND_KIND_NUM
 	ND_KIND_EQ
 	ND_KIND_NE
-	ND_KIND_LT // <
-	ND_KIND_LE // =<
-	ND_KIND_GT // >
-	ND_KIND_GE // >=
+	ND_KIND_LT     // <
+	ND_KIND_LE     // =<
+	ND_KIND_GT     // >
+	ND_KIND_GE     // >=
+	ND_KIND_RETURN // return
 )
 
 type Node struct {
@@ -48,6 +49,12 @@ func printNode(node *Node) {
 			Info("## %+v\n", node)
 			return
 		}
+		if node.Kind == ND_KIND_RETURN {
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
+			printNode(node.Lhs)
+			return
+		}
 		Info("## node %p\n", node)
 		Info("## %+v\n", node)
 		printNode(node.Lhs)
@@ -68,6 +75,18 @@ func Program(tok *Token) (*Token, *Node) {
 	return tok, head.Next
 }
 func stmt(tok *Token) (*Token, *Node) {
+	if tok.Val == "return" {
+		tok = tok.Next
+		tok, e_node := expr(tok)
+		node := newNode(ND_KIND_RETURN, e_node, nil)
+
+		if tok.Val != ";" {
+			panic("; not found")
+		}
+		tok = tok.Next
+		return tok, node
+	}
+
 	tok, node := expr(tok)
 	if tok.Val != ";" {
 		panic("; not found")

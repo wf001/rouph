@@ -9,6 +9,12 @@ func gen(node *Node) {
 		fmt.Printf("  push %d\n", node.Val)
 		return
 	}
+	if node.Kind == ND_KIND_RETURN {
+        gen(node.Lhs)
+		fmt.Printf("  pop rax\n")
+		fmt.Printf("  ret\n")
+		return
+	}
 	gen(node.Lhs)
 	gen(node.Rhs)
 	fmt.Println("  pop rdi")
