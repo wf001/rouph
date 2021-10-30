@@ -86,82 +86,41 @@ func TokenizeHandler() *Token {
 	return head
 }
 
-func isNumber(s string) int {
-	i, err := strconv.Atoi(s)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	return i
-}
-
-func strTol(input string) []string {
-	length := len(input)
-	i := 0
-	var arr []string
-	for {
-		if i == length {
-			return arr
-		}
-		// if input[i] is number
-		if _, res := strChr(string(input[i])); !res {
-			ai := string(input[i])
-			for {
-				i += 1
-				if i == length {
-					arr = append(arr, ai)
-					return arr
-				}
-				if sig, res := isEquOrRel(input[i:]); res {
-					arr = append(arr, ai)
-					arr = append(arr, sig)
-					ai = ""
-					i += 2
-					// if input[i] is reserved sign
-				} else if _, res := strChr(string(input[i])); res {
-					arr = append(arr, ai)
-					arr = append(arr, string(input[i]))
-					break
-				}
-				ai += string(input[i])
-			}
-		} else {
-			arr = append(arr, string(input[i]))
-		}
-		i += 1
-	}
-}
 func Scan(input string, i int, n int, arr []string, number string) []string {
 	if i == n {
-		if len(number) > 0 {
-			arr = append(arr, number)
-		}
+		arr = appendIfExists(arr, number)
 		return arr
 	}
 	// if input[i] equ or rel
 	if sig, res := isEquOrRel(string(input[i:])); res {
-		if len(number) > 0 {
-			arr = append(arr, number)
-		}
-		return Scan(input, i+2, n, append(arr, sig), "")
+		arr = appendIfExists(arr, number)
+		arr, number = append(arr, sig), ""
+		i += 2
 		// if input[i] is other reserved
 	} else if sig, res := strChr(string(input[i])); res {
-		if len(number) > 0 {
-			arr = append(arr, number)
-		}
-		return Scan(input, i+1, n, append(arr, sig), "")
+		arr = appendIfExists(arr, number)
+		arr, number = append(arr, sig), ""
+		i += 1
 		// if input[i] is number
 	} else {
 		number += string(input[i])
-		return Scan(input, i+1, n, arr, number)
+		_ = isNumber(number)
+		i += 1
 	}
+	return Scan(input, i, n, arr, number)
+}
+func appendIfExists(arr []string, number string) []string {
+	if len(number) > 0 {
+		arr = append(arr, number)
+	}
+	return arr
 }
 func strChr(input string) (string, bool) {
-	v := []string{"+", "-", "*", "/", "(", ")", ">", "<"}
+	v := "+-*/()><"
 
 	for _, vi := range v {
-		if strings.HasPrefix(input, vi) {
-			return vi, true
+		if string(input[0]) == string(vi) {
+			return string(vi), true
 		}
 	}
 	return "", false
@@ -171,12 +130,18 @@ func isEquOrRel(input string) (string, bool) {
 	v := []string{"==", "!=", ">=", "=<"}
 
 	for _, vi := range v {
-		Info("input:%s\n", input)
-		Info("vi:%s\n", vi)
 		if strings.HasPrefix(input, vi) {
 			return vi, true
 		}
 	}
 	return "", false
 
+}
+func isNumber(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	return i
 }

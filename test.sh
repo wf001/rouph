@@ -81,6 +81,7 @@ assert 0 '2>=3'
 assert 1 '2>=2'
 assert 1 '12>=2'
 assert 0 '2>=12'
+assert 0 'a>=12'
 assert 1 '(4-1)>=(5-2)'
 
 rm -f tmp.s
