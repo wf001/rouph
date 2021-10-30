@@ -22,7 +22,7 @@ type Token struct {
 	Kind TokKind
 	Next *Token
 	Val  string
-    str string
+	str  string
 }
 
 /*
@@ -63,8 +63,10 @@ func TokenizeHandler() *Token {
 	arg := flag.Arg(0)
 	// space trim
 	arg = strings.Replace(arg, " ", "", -1)
+	Info("arg:%s\n", arg)
 	// gen num arr
-	arg_arr := strTol(arg)
+	var arg_arr []string
+	arg_arr = f(arg, 0, len(arg), arg_arr, "")
 
 	head := new(Token)
 	head.Next = nil
@@ -73,7 +75,7 @@ func TokenizeHandler() *Token {
 
 	//tokenize
 	for _, s := range arg_arr {
-		if strChr(s) {
+		if _, res := strChr(s); res {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
 		} else {
 			cur = newToken(TK_KIND_NUM, cur, s)
@@ -102,7 +104,7 @@ func strTol(input string) []string {
 			return arr
 		}
 		// if input[i] is number
-		if !strChr(string(input[i])) {
+		if _, res := strChr(string(input[i])); !res {
 			ai := string(input[i])
 			for {
 				i += 1
@@ -110,13 +112,13 @@ func strTol(input string) []string {
 					arr = append(arr, ai)
 					return arr
 				}
-                if sig, res := isEquOrRel(input[i:]); res {
+				if sig, res := isEquOrRel(input[i:]); res {
 					arr = append(arr, ai)
 					arr = append(arr, sig)
 					ai = ""
 					i += 2
 					// if input[i] is reserved sign
-				} else if strChr(string(input[i])) {
+				} else if _, res := strChr(string(input[i])); res {
 					arr = append(arr, ai)
 					arr = append(arr, string(input[i]))
 					break
@@ -129,16 +131,48 @@ func strTol(input string) []string {
 		i += 1
 	}
 }
+func f(input string, i int, n int, arr []string, number string) []string {
+	if i == n {
+		if len(number) > 0 {
+			arr = append(arr, number)
+		}
+		return arr
+	}
+	// if input[i] equ or rel
+	if sig, res := isEquOrRel(string(input[i:])); res {
+		if len(number) > 0 {
+			arr = append(arr, number)
+		}
+		return f(input, i+2, n, append(arr, sig), "")
+		// if input[i] is other reserved
+	} else if sig, res := strChr(string(input[i])); res {
+		if len(number) > 0 {
+			arr = append(arr, number)
+		}
+		return f(input, i+1, n, append(arr, sig), "")
+		// if input[i] is number
+	} else {
+		number += string(input[i])
+		return f(input, i+1, n, arr, number)
+	}
+}
+func strChr(input string) (string, bool) {
+	v := []string{"+", "-", "*", "/", "(", ")", ">", "<"}
 
-func strChr(s string) bool {
-	tgt := "+-*/()<>"
-	return strings.Contains(tgt, s)
+	for _, vi := range v {
+		if strings.HasPrefix(input, vi) {
+			return vi, true
+		}
+	}
+	return "", false
 }
 
 func isEquOrRel(input string) (string, bool) {
 	v := []string{"==", "!=", ">=", "=<"}
 
 	for _, vi := range v {
+		Info("input:%s\n", input)
+		Info("vi:%s\n", vi)
 		if strings.HasPrefix(input, vi) {
 			return vi, true
 		}
