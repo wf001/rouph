@@ -3,10 +3,13 @@ package main
 func main() {
 	head := TokenizeHandler()
 	printToken(head)
-	_, node := Expr(head.Next)
-
+	_, node := Program(head.Next)
+    n := node
 	Info("%s\n", "=================")
-	printNode(node)
+	for ; n != nil; n = n.Next {
+        printNode(n)
+        Info("%s\n", "## [rel next]")
+    }
 	Info("%s\n", "=================")
 	codegen(node)
 

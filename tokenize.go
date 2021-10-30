@@ -31,6 +31,7 @@ Token Func
 func printToken(tok *Token) {
 	if DEBUG {
 		fmt.Println("==========================")
+		Info("%s\n", "### print token ###")
 		for ; tok != nil; tok = tok.Next {
 			Info("tok %p\n", tok)
 			Info("%+v\n", tok)
@@ -116,7 +117,7 @@ func appendIfExists(arr []string, number string) []string {
 	return arr
 }
 func strChr(input string) (string, bool) {
-	v := "+-*/()><"
+	v := "+-*/()><;"
 
 	for _, vi := range v {
 		if string(input[0]) == string(vi) {
