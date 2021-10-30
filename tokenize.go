@@ -62,7 +62,6 @@ func TokenizeHandler() *Token {
 	flag.Parse()
 	arg := flag.Arg(0)
 	// space trim
-	arg = strings.Replace(arg, " ", "", -1)
 	Info("arg:%s\n", arg)
 	// gen num arr
 	var arg_arr []string
@@ -91,11 +90,18 @@ func Scan(input string, i int, n int, arr []string, number string) []string {
 		arr = appendIfExists(arr, number)
 		return arr
 	}
+    if string(input[i]) == " " {
+		arr = appendIfExists(arr, number)
+        number = ""
+		i += 1
+	    return Scan(input, i, n, arr, number)
+    }
 	// if input[i] equ or rel
-	if sig, res := isEquOrRel(string(input[i:])); res {
+	v := []string{"==", "!=", ">=", "=<", "return"}
+	if sig, res := startWith(string(input[i:]), v); res {
 		arr = appendIfExists(arr, number)
 		arr, number = append(arr, sig), ""
-		i += 2
+		i += len(sig)
 		// if input[i] is other reserved
 	} else if sig, res := strChr(string(input[i])); res {
 		arr = appendIfExists(arr, number)
@@ -126,8 +132,7 @@ func strChr(input string) (string, bool) {
 	return "", false
 }
 
-func isEquOrRel(input string) (string, bool) {
-	v := []string{"==", "!=", ">=", "=<"}
+func startWith(input string, v []string) (string, bool) {
 
 	for _, vi := range v {
 		if strings.HasPrefix(input, vi) {
