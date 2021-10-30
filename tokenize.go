@@ -23,7 +23,6 @@ type Token struct {
 	Next *Token
 	Val  string
     str string
-    len int32
 }
 
 /*
@@ -53,9 +52,6 @@ func sep() {
 }
 
 func newToken(kind TokKind, cur *Token, val string) *Token {
-	Info("kind: %d\n", kind)
-	Info("cur: %+v\n", cur)
-	Info("val: %s\n", val)
 	tok := new(Token)
 	tok.Kind = kind
 	tok.Val = val
@@ -84,7 +80,6 @@ func TokenizeHandler() *Token {
 		}
 	}
 	cur = newToken(TK_KIND_EOF, cur, "")
-	printToken(head)
 
 	return head
 }
@@ -136,7 +131,7 @@ func strTol(input string) []string {
 }
 
 func strChr(s string) bool {
-	tgt := "+-*/()"
+	tgt := "+-*/()<>"
 	return strings.Contains(tgt, s)
 }
 
