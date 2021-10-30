@@ -27,7 +27,6 @@ type Node struct {
 Node Func
 */
 func newNode(kind NodeKind, lhs *Node, rhs *Node) *Node {
-	Info("newNode %d\n", kind)
 	node := new(Node)
 	node.Kind = kind
 	node.Lhs = lhs
@@ -35,9 +34,7 @@ func newNode(kind NodeKind, lhs *Node, rhs *Node) *Node {
 	return node
 }
 func newNodeNum(val int) *Node {
-	Info("newNodeNum %d\n", val)
 	node := new(Node)
-	Info("%p\n", node)
 	node.Kind = ND_KIND_NUM
 	node.Val = val
 	return node
@@ -57,7 +54,7 @@ func printNode(node *Node) {
 	}
 }
 func Expr(tok *Token) (*Token, *Node) {
-    return equality(tok)
+	return equality(tok)
 }
 func equality(tok *Token) (*Token, *Node) {
 	var m_node *Node
@@ -110,7 +107,7 @@ func relational(tok *Token) (*Token, *Node) {
 	}
 }
 
-func add(tok *Token) (*Token, *Node){
+func add(tok *Token) (*Token, *Node) {
 	var m_node *Node
 	Info("%s\n", "expr")
 	Info("%p\n", tok)
