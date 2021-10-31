@@ -2,6 +2,8 @@ package main
 
 type NodeKind int
 
+var Locals *Var
+
 const (
 	ND_KIND_ADD       NodeKind = iota + 1 // +
 	ND_KIND_SUB                           // -
@@ -16,7 +18,7 @@ const (
 	ND_KIND_ASSIGN                        //=
 	ND_KIND_RETURN                        // return
 	ND_KIND_EXPR_STMT                     // Expression Statement
-	ND_KIND_LVAR                          // Local Variables
+	ND_KIND_VAR                           // Local Variables
 	ND_KIND_NUM                           // Integer
 )
 
@@ -29,7 +31,20 @@ type Node struct {
 	Val  int
 }
 
-func Program(tok *Token) (*Token, *Node) {
+type Var struct {
+	Next   *Var
+	Name   string
+	Offset int
+}
+
+type Prg struct {
+    N *Node
+    Locals *Var
+    StackSize int
+}
+
+func Program(tok *Token) *Prg {
+    Locals = nil
 	head := new(Node)
 	head.Next = nil
 	cur := head
@@ -40,7 +55,12 @@ func Program(tok *Token) (*Token, *Node) {
 		tok, cur.Next = stmt(tok)
 		cur = cur.Next
 	}
-	return tok, head.Next
+
+    prg := new(Prg)
+    prg.N =head.Next
+    prg.Locals = Locals
+
+	return prg
 }
 func stmt(tok *Token) (*Token, *Node) {
 	if tok.Val == "return" {
@@ -202,7 +222,7 @@ func primary(tok *Token) (*Token, *Node) {
 	if tok.Kind == TK_IDENT {
 		i_tok := tok
 		tok = tok.Next
-		return tok, newLval(i_tok.Str)
+		return tok, newVar(i_tok.Str)
 	} else {
 		i := isNumber(tok.Val)
 		tok = tok.Next
@@ -216,10 +236,17 @@ func newNode(kind NodeKind, lhs *Node, rhs *Node) *Node {
 	node.Rhs = rhs
 	return node
 }
-func newLval(ident string) *Node {
-	node := newNode(ND_KIND_LVAR, nil, nil)
-	node.Name = ident
+func newVar(v *Var) *Node {
+	node := newNode(ND_KIND_VAR, nil, nil)
+	node.Var = v
 	return node
+}
+func pushVar(name string) *Var{
+    v := new(*Var)
+    v.Next = Locals
+    v.Name= name
+    Locals = v
+    return v
 }
 func newNodeNum(val int) *Node {
 	node := new(Node)
@@ -264,4 +291,13 @@ func printNode(node *Node) {
 		printNode(node.Lhs)
 		printNode(node.Rhs)
 	}
+}
+
+func findVar(tok *Token) *Var {
+    for v := Locals; v != nil;v = v.Next {
+        if len(v.Name) == tok.Len && v.Name == tok.Str {
+            return v
+        }
+    }
+    return nil
 }
