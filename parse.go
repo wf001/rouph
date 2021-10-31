@@ -224,8 +224,7 @@ func primary(tok *Token) (*Token, *Node) {
 		tok = tok.Next
 		v := findVar(i_tok)
 		if v == nil {
-			s := i_tok.Str
-			v = pushVar(s)
+			v = pushVar(i_tok.Str)
 		}
 		return tok, newVar(v)
 	} else {
@@ -276,6 +275,8 @@ func printNode(node *Node) {
 		if node.Kind == ND_KIND_VAR {
 			Info("## node %p\n", node)
 			Info("## %+v\n", node)
+			Info("->### var %p\n", node.Var)
+			Info("->### var %+v\n", node.Var)
 			return
 		}
 		if node.Kind == ND_KIND_ASSIGN {

@@ -82,7 +82,7 @@ func TokenizeHandler() *Token {
 	Info("arg_arr:%+v\n", arg_arr)
 	for _, s := range arg_arr {
 		Info("%s\n", s)
-		if _, res := strChr(s); res {
+		if _, res := isReserved(s); res {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
 		} else if s == "return" {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
@@ -120,13 +120,14 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 		arr, number, valName = append(arr, op), "", ""
 		i += 2
 		// if input[i] is single-letter operator
-	} else if op, res := strChr(string(input[i])); res {
+	} else if op, res := isReserved(string(input[i])); res {
 		arr = appendIfExists(arr, number, valName)
 		arr, number, valName = append(arr, op), "", ""
 		i += 1
-		// if input[i] is alphabet or number, it is a part of variable name.
+		// if input[i] is alphabet or number, it taken as a part of variable name.
 		// note that ahead of val must be alphabet.
-	} else if isAlpha(rune(input[i])) || (isAlphaNum(rune(input[i])) && valName != "") {
+	} else if isAlpha(rune(input[i])) ||
+		(isAlphaNum(rune(input[i])) && valName != "") {
 		number = ""
 		valName += string(input[i])
 		i += 1
@@ -147,7 +148,7 @@ func appendIfExists(arr []string, number string, valName string) []string {
 	}
 	return arr
 }
-func strChr(input string) (string, bool) {
+func isReserved(input string) (string, bool) {
 
 	for _, vi := range op {
 		if string(input[0]) == string(vi) {

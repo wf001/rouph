@@ -97,6 +97,8 @@ assert 9 'a=2;b=4;return ((a+b)/a)*((a+b)/a);'
 assert 7 'a=2;b=4;return (a/a+a)+b;'
 assert 2 'hoge=2;return hoge;'
 assert 5 'hoge_1=2;fuga=3;return hoge_1+fuga;'
+assert 4 ' al = 2; be = 3; ga=1;return al*be-al*ga;'
+assert 6 'al=2;be=3;ga=1;de=5;return (de-al)*ga+be;'
 rm -f tmp.s
 
 echo $msg
