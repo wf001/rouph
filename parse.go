@@ -27,7 +27,7 @@ type Node struct {
 	Next *Node
 	Lhs  *Node
 	Rhs  *Node
-	Name string
+	Var  *Var
 	Val  int
 }
 
@@ -38,13 +38,13 @@ type Var struct {
 }
 
 type Prg struct {
-    N *Node
-    Locals *Var
-    StackSize int
+	N         *Node
+	Locals    *Var
+	StackSize int
 }
 
 func Program(tok *Token) *Prg {
-    Locals = nil
+	Locals = nil
 	head := new(Node)
 	head.Next = nil
 	cur := head
@@ -56,9 +56,9 @@ func Program(tok *Token) *Prg {
 		cur = cur.Next
 	}
 
-    prg := new(Prg)
-    prg.N =head.Next
-    prg.Locals = Locals
+	prg := new(Prg)
+	prg.N = head.Next
+	prg.Locals = Locals
 
 	return prg
 }
@@ -222,7 +222,12 @@ func primary(tok *Token) (*Token, *Node) {
 	if tok.Kind == TK_IDENT {
 		i_tok := tok
 		tok = tok.Next
-		return tok, newVar(i_tok.Str)
+		v := findVar(i_tok)
+		if v == nil {
+			s := i_tok.Str
+			v = pushVar(s)
+		}
+		return tok, newVar(v)
 	} else {
 		i := isNumber(tok.Val)
 		tok = tok.Next
@@ -241,12 +246,12 @@ func newVar(v *Var) *Node {
 	node.Var = v
 	return node
 }
-func pushVar(name string) *Var{
-    v := new(*Var)
-    v.Next = Locals
-    v.Name= name
-    Locals = v
-    return v
+func pushVar(name string) *Var {
+	v := new(Var)
+	v.Next = Locals
+	v.Name = name
+	Locals = v
+	return v
 }
 func newNodeNum(val int) *Node {
 	node := new(Node)
@@ -268,7 +273,7 @@ func printNode(node *Node) {
 			printNode(node.Lhs)
 			return
 		}
-		if node.Kind == ND_KIND_LVAR {
+		if node.Kind == ND_KIND_VAR {
 			Info("## node %p\n", node)
 			Info("## %+v\n", node)
 			return
@@ -294,10 +299,12 @@ func printNode(node *Node) {
 }
 
 func findVar(tok *Token) *Var {
-    for v := Locals; v != nil;v = v.Next {
-        if len(v.Name) == tok.Len && v.Name == tok.Str {
-            return v
-        }
-    }
-    return nil
+	for v := Locals; v != nil; v = v.Next {
+		Info("findVar:%s\n", v.Name)
+		Info("findVar:%s\n", tok.Str)
+		if v.Name == tok.Str {
+			return v
+		}
+	}
+	return nil
 }

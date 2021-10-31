@@ -122,12 +122,12 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 		// if input[i] is single-letter operator
 	} else if op, res := strChr(string(input[i])); res {
 		arr = appendIfExists(arr, number, valName)
-		arr, number, valName = append(arr, op), "",""
+		arr, number, valName = append(arr, op), "", ""
 		i += 1
 		// if input[i] is alphabet or number, it is a part of variable name.
-        // note that ahead of val must be alphabet.
+		// note that ahead of val must be alphabet.
 	} else if isAlpha(rune(input[i])) || (isAlphaNum(rune(input[i])) && valName != "") {
-        number =""
+		number = ""
 		valName += string(input[i])
 		i += 1
 		// otherwise, input[i] must be number

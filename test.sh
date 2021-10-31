@@ -95,6 +95,8 @@ assert 10 'a=2;b=8;return a+b;'
 assert 4 'a=2;b=4;return b;'
 assert 9 'a=2;b=4;return ((a+b)/a)*((a+b)/a);'
 assert 7 'a=2;b=4;return (a/a+a)+b;'
+assert 2 'hoge=2;return hoge;'
+assert 5 'hoge_1=2;fuga=3;return hoge_1+fuga;'
 rm -f tmp.s
 
 echo $msg

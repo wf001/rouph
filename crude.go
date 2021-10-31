@@ -1,10 +1,10 @@
 package main
 
 func main() {
-    // tokenize
+	// tokenize
 	head := TokenizeHandler()
 	printToken(head)
-    // parse
+	// parse
 	prg := Program(head.Next)
 
 	offset := 0
@@ -21,7 +21,7 @@ func main() {
 		Info("%s\n", "## [ref next]")
 	}
 	Info("%s\n", "=================")
-    // generate
+	// generate
 	codegen(prg)
 
 }
