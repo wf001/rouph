@@ -8,20 +8,20 @@ func genAddr(node *Node) {
 	if node.Kind == ND_KIND_VAR {
 		fmt.Printf("  lea rax, [rbp-%d]\n", node.Var.Offset)
 		fmt.Println("  push rax")
-        return
+		return
 	}
-    panic("not an local value.")
+	panic("not an local value.")
 }
-func load(){
-    fmt.Println("  pop rax")
-    fmt.Println("  mov rax, [rax]")
-    fmt.Println("  push rax")
+func load() {
+	fmt.Println("  pop rax")
+	fmt.Println("  mov rax, [rax]")
+	fmt.Println("  push rax")
 }
-func store(){
-    fmt.Println("  pop rdi")
-    fmt.Println("  pop rax")
-    fmt.Println("  mov [rax], rdi")
-    fmt.Println("  push rdi")
+func store() {
+	fmt.Println("  pop rdi")
+	fmt.Println("  pop rax")
+	fmt.Println("  mov [rax], rdi")
+	fmt.Println("  push rdi")
 }
 
 func gen(node *Node) {
@@ -33,17 +33,17 @@ func gen(node *Node) {
 		gen(node.Lhs)
 		fmt.Println("  add rsp, 8")
 		return
-    case ND_KIND_VAR:
-        genAddr(node)
-        load()
-        return
-    case ND_KIND_ASSIGN:
-        // push local val address
-        genAddr(node.Lhs)
-        // push right side val
-        gen(node.Rhs)
-        store()
-        return
+	case ND_KIND_VAR:
+		genAddr(node)
+		load()
+		return
+	case ND_KIND_ASSIGN:
+		// push local val address
+		genAddr(node.Lhs)
+		// push right side val
+		gen(node.Rhs)
+		store()
+		return
 	case ND_KIND_RETURN:
 		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
@@ -108,15 +108,15 @@ func codegen(prg *Prg) {
 	fmt.Println(".intel_syntax noprefix")
 	fmt.Println(".global main")
 	fmt.Println("main:")
-    fmt.Println("  push rbp")
-    fmt.Println("  mov rbp, rsp")
-    fmt.Printf("  sub rsp, %d\n", prg.StackSize)
+	fmt.Println("  push rbp")
+	fmt.Println("  mov rbp, rsp")
+	fmt.Printf("  sub rsp, %d\n", prg.StackSize)
 
-    for node := prg.N ; node != nil; node = node.Next {
+	for node := prg.N; node != nil; node = node.Next {
 		gen(node)
 	}
-    fmt.Println(".Lreturn:")
-    fmt.Println("  mov rsp, rbp")
-    fmt.Println("  pop rbp")
+	fmt.Println(".Lreturn:")
+	fmt.Println("  mov rsp, rbp")
+	fmt.Println("  pop rbp")
 	fmt.Println("  ret")
 }
