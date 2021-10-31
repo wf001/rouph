@@ -71,7 +71,7 @@ func TokenizeHandler() *Token {
 	Info("arg:%s\n", arg)
 	// gen num arr
 	var arg_arr []string
-	arg_arr = Scan(arg, 0, len(arg), arg_arr, "")
+	arg_arr = Scan(arg, 0, len(arg), arg_arr, "", "")
 
 	head := new(Token)
 	head.Next = nil
@@ -97,36 +97,38 @@ func TokenizeHandler() *Token {
 	return head
 }
 
-func Scan(input string, i int, n int, arr []string, number string) []string {
+func Scan(input string, i int, n int, arr []string, number string, valName string) []string {
 	if i == n {
-		arr = appendIfExists(arr, number)
+		arr = appendIfExists(arr, number, valName)
 		return arr
 	}
 	Info("Scan %s\n", string(input[i:]))
 	// if input[i] is space, it skipped
 	if string(input[i]) == " " {
-		arr = appendIfExists(arr, number)
-		number = ""
+		arr = appendIfExists(arr, number, valName)
+		number, valName = "", ""
 		i += 1
 		// if input[i] is reserved signature
 	} else if sig, res := startWith(string(input[i:]), reserve_sig); res &&
 		!isAlphaNum(rune(input[i+6])) {
-		arr = appendIfExists(arr, number)
-		arr, number = append(arr, sig), ""
+		arr = appendIfExists(arr, number, valName)
+		arr, number, valName = append(arr, sig), "", ""
 		i += 6
 		// if input[i] is Equality or Relational operator
 	} else if op, res := startWith(string(input[i:]), eq_rel_op); res {
-		arr = appendIfExists(arr, number)
-		arr, number = append(arr, op), ""
+		arr = appendIfExists(arr, number, valName)
+		arr, number, valName = append(arr, op), "", ""
 		i += 2
-		// if input[i] is binary operator
+		// if input[i] is single-letter operator
 	} else if op, res := strChr(string(input[i])); res {
-		arr = appendIfExists(arr, number)
-		arr, number = append(arr, op), ""
+		arr = appendIfExists(arr, number, valName)
+		arr, number, valName = append(arr, op), "",""
 		i += 1
-		// otherwise, input[i] must be number
-	} else if isAlpha(rune(input[i])) {
-		arr, number = append(arr, string(input[i])), ""
+		// if input[i] is alphabet or number, it is a part of variable name.
+        // note that ahead of val must be alphabet.
+	} else if isAlpha(rune(input[i])) || (isAlphaNum(rune(input[i])) && valName != "") {
+        number =""
+		valName += string(input[i])
 		i += 1
 		// otherwise, input[i] must be number
 	} else {
@@ -134,11 +136,14 @@ func Scan(input string, i int, n int, arr []string, number string) []string {
 		_ = isNumber(number)
 		i += 1
 	}
-	return Scan(input, i, n, arr, number)
+	return Scan(input, i, n, arr, number, valName)
 }
-func appendIfExists(arr []string, number string) []string {
+func appendIfExists(arr []string, number string, valName string) []string {
 	if len(number) > 0 {
 		arr = append(arr, number)
+	}
+	if len(valName) > 0 {
+		arr = append(arr, valName)
 	}
 	return arr
 }
