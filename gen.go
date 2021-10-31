@@ -5,9 +5,8 @@ import (
 )
 
 func genAddr(node *Node) {
-	if node.Kind == ND_KIND_LVAR {
-		offset := (rune(node.Name[0]) - rune('a') + 1) * 8
-		fmt.Printf("  lea rax, [rbp-%d]\n", offset)
+	if node.Kind == ND_KIND_VAR {
+		fmt.Printf("  lea rax, [rbp-%d]\n", node.Var.Offset)
 		fmt.Println("  push rax")
         return
 	}
@@ -34,7 +33,7 @@ func gen(node *Node) {
 		gen(node.Lhs)
 		fmt.Println("  add rsp, 8")
 		return
-    case ND_KIND_LVAR:
+    case ND_KIND_VAR:
         genAddr(node)
         load()
         return
@@ -103,7 +102,7 @@ func gen(node *Node) {
 	}
 	fmt.Println("  push rax")
 }
-func codegen(node *Node) {
+func codegen(prg *Prg) {
 	Info("%s\n", "---------------------- instruction ---------------")
 	Info("%s\n", "")
 	fmt.Println(".intel_syntax noprefix")
@@ -111,10 +110,9 @@ func codegen(node *Node) {
 	fmt.Println("main:")
     fmt.Println("  push rbp")
     fmt.Println("  mov rbp, rsp")
-    fmt.Println("  sub rsp, 208")
-	Info("%+v\n", node.Next)
+    fmt.Printf("  sub rsp, %d\n", prg.StackSize)
 
-	for ; node != nil; node = node.Next {
+    for node := prg.N ; node != nil; node = node.Next {
 		gen(node)
 	}
     fmt.Println(".Lreturn:")
