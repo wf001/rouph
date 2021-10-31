@@ -3,3 +3,5 @@ crude-lang-go
 *.o
 tmp
 *.s
+.gdb_history
+peda-session*

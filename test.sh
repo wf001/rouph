@@ -20,6 +20,8 @@ assert() {
 }
 
 go build .
+# nasm -f elf64 tmp.s
+# ld -s -o tmp tmp.o
 
 #############
 # Assertion
