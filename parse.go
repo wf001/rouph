@@ -3,21 +3,21 @@ package main
 type NodeKind int
 
 const (
-	ND_KIND_ADD NodeKind = iota + 1 // +
-	ND_KIND_SUB                     // -
-	ND_KIND_MUL                     // *
-	ND_KIND_DIV                     // /
-	ND_KIND_EQ                      // ==
-	ND_KIND_NE                      // !=
-	ND_KIND_LT                      // <
-	ND_KIND_LE                      // =<
-	ND_KIND_GT                      // >
-	ND_KIND_GE                      // >=
-	ND_KIND_ASSIGN
-	ND_KIND_RETURN    // return
-	ND_KIND_EXPR_STMT // Expression Statement
-	ND_KIND_LVAR
-	ND_KIND_NUM // Integer
+	ND_KIND_ADD       NodeKind = iota + 1 // +
+	ND_KIND_SUB                           // -
+	ND_KIND_MUL                           // *
+	ND_KIND_DIV                           // /
+	ND_KIND_EQ                            // ==
+	ND_KIND_NE                            // !=
+	ND_KIND_LT                            // <
+	ND_KIND_LE                            // =<
+	ND_KIND_GT                            // >
+	ND_KIND_GE                            // >=
+	ND_KIND_ASSIGN                        //=
+	ND_KIND_RETURN                        // return
+	ND_KIND_EXPR_STMT                     // Expression Statement
+	ND_KIND_LVAR                          // Local Variables
+	ND_KIND_NUM                           // Integer
 )
 
 type Node struct {
@@ -29,58 +29,6 @@ type Node struct {
 	Val  int
 }
 
-/*
-Node Func
-*/
-func newNode(kind NodeKind, lhs *Node, rhs *Node) *Node {
-	node := new(Node)
-	node.Kind = kind
-	node.Lhs = lhs
-	node.Rhs = rhs
-	return node
-}
-func newLval(ident string) *Node {
-	node := newNode(ND_KIND_LVAR, nil, nil)
-	node.Name = ident
-	return node
-}
-func newNodeNum(val int) *Node {
-	node := new(Node)
-	node.Kind = ND_KIND_NUM
-	node.Val = val
-	return node
-}
-
-func printNode(node *Node) {
-	if DEBUG {
-		if node.Kind == ND_KIND_NUM {
-			Info("## node %p\n", node)
-			Info("## %+v\n", node)
-			return
-		}
-		if node.Kind == ND_KIND_EXPR_STMT {
-			printNode(node.Lhs)
-			return
-		}
-		if node.Kind == ND_KIND_LVAR {
-			return
-		}
-		if node.Kind == ND_KIND_ASSIGN {
-			printNode(node.Rhs)
-            return
-		}
-		if node.Kind == ND_KIND_RETURN {
-			Info("## node %p\n", node)
-			Info("## %+v\n", node)
-			printNode(node.Lhs)
-			return
-		}
-		Info("## node %p\n", node)
-		Info("## %+v\n", node)
-		printNode(node.Lhs)
-		printNode(node.Rhs)
-	}
-}
 func Program(tok *Token) (*Token, *Node) {
 	head := new(Node)
 	head.Next = nil
@@ -124,6 +72,8 @@ func assign(tok *Token) (*Token, *Node) {
 	tok, node := equality(tok)
 	if tok.Val == "=" {
 		tok = tok.Next
+		// node is left side value
+		// a_node is right side value
 		tok, a_node = assign(tok)
 		node = newNode(ND_KIND_ASSIGN, node, a_node)
 	}
@@ -257,5 +207,61 @@ func primary(tok *Token) (*Token, *Node) {
 		i := isNumber(tok.Val)
 		tok = tok.Next
 		return tok, newNodeNum(i)
+	}
+}
+func newNode(kind NodeKind, lhs *Node, rhs *Node) *Node {
+	node := new(Node)
+	node.Kind = kind
+	node.Lhs = lhs
+	node.Rhs = rhs
+	return node
+}
+func newLval(ident string) *Node {
+	node := newNode(ND_KIND_LVAR, nil, nil)
+	node.Name = ident
+	return node
+}
+func newNodeNum(val int) *Node {
+	node := new(Node)
+	node.Kind = ND_KIND_NUM
+	node.Val = val
+	return node
+}
+
+func printNode(node *Node) {
+	if DEBUG {
+		if node.Kind == ND_KIND_NUM {
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
+			return
+		}
+		if node.Kind == ND_KIND_EXPR_STMT {
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
+			printNode(node.Lhs)
+			return
+		}
+		if node.Kind == ND_KIND_LVAR {
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
+			return
+		}
+		if node.Kind == ND_KIND_ASSIGN {
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
+			printNode(node.Lhs)
+			printNode(node.Rhs)
+			return
+		}
+		if node.Kind == ND_KIND_RETURN {
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
+			printNode(node.Lhs)
+			return
+		}
+		Info("## node %p\n", node)
+		Info("## %+v\n", node)
+		printNode(node.Lhs)
+		printNode(node.Rhs)
 	}
 }

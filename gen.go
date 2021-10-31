@@ -39,7 +39,9 @@ func gen(node *Node) {
         load()
         return
     case ND_KIND_ASSIGN:
+        // push local val address
         genAddr(node.Lhs)
+        // push right side val
         gen(node.Rhs)
         store()
         return
