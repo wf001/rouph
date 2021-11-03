@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var reserve_sig = []string{"return"}
+var reserve_sig = []string{"return", "if", "else"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
 var op = "+-*/()><;="
 
@@ -110,10 +110,10 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 		i += 1
 		// if input[i] is reserved signature
 	} else if sig, res := startWith(string(input[i:]), reserve_sig); res &&
-		!isAlphaNum(rune(input[i+6])) {
+		!isAlphaNum(rune(input[i+len(sig)])) {
 		arr = appendIfExists(arr, number, valName)
 		arr, number, valName = append(arr, sig), "", ""
-		i += 6
+		i += len(sig)
 		// if input[i] is Equality or Relational operator
 	} else if op, res := startWith(string(input[i:]), eq_rel_op); res {
 		arr = appendIfExists(arr, number, valName)

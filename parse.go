@@ -17,6 +17,7 @@ const (
 	ND_KIND_GE                            // >=
 	ND_KIND_ASSIGN                        //=
 	ND_KIND_RETURN                        // return
+	ND_KIND_IF                            //if
 	ND_KIND_EXPR_STMT                     // Expression Statement
 	ND_KIND_VAR                           // Local Variables
 	ND_KIND_NUM                           // Integer
@@ -26,6 +27,9 @@ type Node struct {
 	Kind NodeKind
 	Next *Node
 	Lhs  *Node
+	Cond *Node
+	Then *Node
+	Else *Node
 	Rhs  *Node
 	Var  *Var
 	Val  int
@@ -75,9 +79,34 @@ func stmt(tok *Token) (*Token, *Node) {
 		return tok, node
 	}
 
+	if tok.Str == "if" {
+		node := newNode(ND_KIND_IF, nil, nil)
+		tok = tok.Next
+
+		if tok.Val != "(" {
+			panic("( not found")
+		}
+		tok = tok.Next
+		tok, node.Cond = expr(tok)
+
+		if tok.Val != ")" {
+			panic(") not found")
+		}
+		tok = tok.Next
+		tok, node.Then = stmt(tok)
+
+		if tok.Str == "else" {
+			tok = tok.Next
+			tok, node.Else = stmt(tok)
+		}
+
+		return tok, node
+	}
+
 	tok, e_node := expr(tok)
 	node := newNode(ND_KIND_EXPR_STMT, e_node, nil)
 
+	Info("tok :: %v\n", tok.Val)
 	if tok.Val != ";" {
 		panic("; not found")
 	}
@@ -284,6 +313,17 @@ func printNode(node *Node) {
 			Info("## %+v\n", node)
 			printNode(node.Lhs)
 			printNode(node.Rhs)
+			return
+		}
+		if node.Kind == ND_KIND_IF {
+			if node.Else != nil {
+				gen(node.Cond)
+				gen(node.Then)
+				gen(node.Else)
+			} else {
+				gen(node.Cond)
+				gen(node.Then)
+			}
 			return
 		}
 		if node.Kind == ND_KIND_RETURN {

@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var labelSeq = 0
+
 func genAddr(node *Node) {
 	if node.Kind == ND_KIND_VAR {
 		fmt.Printf("  lea rax, [rbp-%d]\n", node.Var.Offset)
@@ -43,6 +45,28 @@ func gen(node *Node) {
 		// push right side val
 		gen(node.Rhs)
 		store()
+		return
+	case ND_KIND_IF:
+		var seq = labelSeq
+		labelSeq++
+		if node.Else != nil {
+			gen(node.Cond)
+			fmt.Println("  pop rax")
+			fmt.Println("  cmp rax, 0")
+			fmt.Printf("  je .Lelse%d\n", seq)
+			gen(node.Then)
+			fmt.Printf("  je .Lend%d\n", seq)
+			fmt.Printf(".Lelse%d:\n", seq)
+			gen(node.Else)
+			fmt.Printf(".Lend%d:\n", seq)
+		} else {
+			gen(node.Cond)
+			fmt.Println("  pop rax")
+			fmt.Println("  cmp rax,0")
+			fmt.Printf("  je .Lend%d\n", seq)
+			gen(node.Then)
+			fmt.Printf(".Lend%d:\n", seq)
+		}
 		return
 	case ND_KIND_RETURN:
 		gen(node.Lhs)
