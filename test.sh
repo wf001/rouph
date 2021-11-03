@@ -99,6 +99,12 @@ assert 2 'hoge=2;return hoge;'
 assert 5 'hoge_1=2;fuga=3;return hoge_1+fuga;'
 assert 4 ' al = 2; be = 3; ga=1;return al*be-al*ga;'
 assert 6 'al=2;be=3;ga=1;de=5;return (de-al)*ga+be;'
+assert 10 'if (1) return 10;return 20;'
+assert 20 'if (0) return 10;return 20;'
+assert 20 'if (1==0) return 10;return 20;'
+assert 10 'hoge=1;if (hoge) return 10;return 20;'
+assert 30 'hoge=2;if (hoge==0) return 10; if(hoge==1) return 20; else return 30;'
+assert 20 'hoge=2;if (hoge<1)return 10 ; else return 20;'
 rm -f tmp.s
 
 echo $msg
