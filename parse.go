@@ -18,6 +18,7 @@ const (
 	ND_KIND_ASSIGN                        //=
 	ND_KIND_RETURN                        // return
 	ND_KIND_IF                            //if
+	ND_KIND_FOR                           //for
 	ND_KIND_EXPR_STMT                     // Expression Statement
 	ND_KIND_VAR                           // Local Variables
 	ND_KIND_NUM                           // Integer
@@ -30,6 +31,8 @@ type Node struct {
 	Cond *Node
 	Then *Node
 	Else *Node
+	Init *Node
+	Inc  *Node
 	Rhs  *Node
 	Var  *Var
 	Val  int
@@ -67,6 +70,7 @@ func Program(tok *Token) *Prg {
 	return prg
 }
 func stmt(tok *Token) (*Token, *Node) {
+	Info("stmt : %+v\n", tok)
 	if tok.Val == "return" {
 		tok = tok.Next
 		tok, e_node := expr(tok)
@@ -102,11 +106,43 @@ func stmt(tok *Token) (*Token, *Node) {
 
 		return tok, node
 	}
+	if tok.Str == "for" {
+		Info("--%s\n", "for")
+		node := newNode(ND_KIND_FOR, nil, nil)
+		tok = tok.Next
+		if tok.Val != "(" {
+			panic("; not found")
+		}
+		if tok.Val != ";" {
+			tok = tok.Next
+			tok, node.Init = readExprStmt(tok)
+			if tok.Val != ";" {
+				panic("; not found")
+			}
+		}
+		if tok.Val != ";" {
+			tok = tok.Next
+			tok, node.Cond = expr(tok)
+			if tok.Val != ";" {
+				panic("; not found")
+			}
+		}
+		if tok.Val != ")" {
+			tok = tok.Next
+			tok, node.Inc = readExprStmt(tok)
+			if tok.Val != ";" {
+				panic("; not found")
+			}
+			tok = tok.Next
+		}
+		Info("%d\n", 5)
+		tok, node.Then = stmt(tok)
+		return tok, node
+	}
 
-	tok, e_node := expr(tok)
-	node := newNode(ND_KIND_EXPR_STMT, e_node, nil)
+	tok, node := readExprStmt(tok)
 
-	Info("tok :: %v\n", tok.Val)
+	Info("tok :: %+v\n", tok)
 	if tok.Val != ";" {
 		panic("; not found")
 	}
@@ -348,4 +384,10 @@ func findVar(tok *Token) *Var {
 		}
 	}
 	return nil
+}
+func readExprStmt(tok *Token) (*Token, *Node) {
+	tok, r_node := expr(tok)
+	node := newNode(ND_KIND_EXPR_STMT, r_node, nil)
+	return tok, node
+
 }
