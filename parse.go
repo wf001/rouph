@@ -111,27 +111,31 @@ func stmt(tok *Token) (*Token, *Node) {
 		node := newNode(ND_KIND_FOR, nil, nil)
 		tok = tok.Next
 		if tok.Val != "(" {
-			panic("; not found")
+			panic("( not found")
 		}
+        tok = tok.Next
 		if tok.Val != ";" {
-			tok = tok.Next
+			Info("%d\n", 1)
 			tok, node.Init = readExprStmt(tok)
 			if tok.Val != ";" {
 				panic("; not found")
 			}
 		}
+        tok = tok.Next
 		if tok.Val != ";" {
-			tok = tok.Next
+			Info("%d\n", 2)
 			tok, node.Cond = expr(tok)
 			if tok.Val != ";" {
 				panic("; not found")
 			}
 		}
+        tok = tok.Next
 		if tok.Val != ")" {
-			tok = tok.Next
+			Info("%d\n", 3)
 			tok, node.Inc = readExprStmt(tok)
-			if tok.Val != ";" {
-				panic("; not found")
+            Info(") %+v\n", tok)
+			if tok.Val != ")" {
+				panic(") not found")
 			}
 			tok = tok.Next
 		}
