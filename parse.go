@@ -107,39 +107,39 @@ func stmt(tok *Token) (*Token, *Node) {
 		return tok, node
 	}
 	if tok.Str == "for" {
-		Info("--%s\n", "for")
-		node := newNode(ND_KIND_FOR, nil, nil)
+		Info("%s\n", "for")
 		tok = tok.Next
+		node := newNode(ND_KIND_FOR, nil, nil)
+
 		if tok.Val != "(" {
 			panic("( not found")
 		}
-        tok = tok.Next
+		tok = tok.Next
+
 		if tok.Val != ";" {
-			Info("%d\n", 1)
 			tok, node.Init = readExprStmt(tok)
 			if tok.Val != ";" {
 				panic("; not found")
 			}
 		}
-        tok = tok.Next
+		tok = tok.Next
+
 		if tok.Val != ";" {
-			Info("%d\n", 2)
 			tok, node.Cond = expr(tok)
 			if tok.Val != ";" {
 				panic("; not found")
 			}
 		}
-        tok = tok.Next
+		tok = tok.Next
+
 		if tok.Val != ")" {
-			Info("%d\n", 3)
+			Info(") %+v\n", tok)
 			tok, node.Inc = readExprStmt(tok)
-            Info(") %+v\n", tok)
 			if tok.Val != ")" {
 				panic(") not found")
 			}
-			tok = tok.Next
 		}
-		Info("%d\n", 5)
+		tok = tok.Next
 		tok, node.Then = stmt(tok)
 		return tok, node
 	}
