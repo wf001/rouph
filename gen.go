@@ -103,7 +103,23 @@ func gen(node *Node) {
 		for i := nargs - 1; i >= 0; i -= 1 {
 			fmt.Printf("  pop %s\n", argReg[i])
 		}
+
+		seq := labelSeq
+		labelSeq += 1
+		fmt.Println("  mov rax, rsp")
+		fmt.Println("  and rax, 15")
+		fmt.Printf("  jnz .Lcall%d\n", seq)
+		fmt.Println("  mov rax, 0")
 		fmt.Printf("  call %s\n", node.Func)
+		fmt.Printf("  jmp .Lend%d\n", seq)
+
+		fmt.Printf(".Lcall%d:\n", seq)
+		fmt.Println("  sub rsp, 8")
+		fmt.Println("  mov rax, 0")
+		fmt.Printf("  call %s\n", node.Func)
+		fmt.Println("  add rsp, 8")
+
+		fmt.Printf(" .Lend%d:\n", seq)
 		fmt.Printf("  push rax\n")
 		return
 	case ND_KIND_RETURN:
