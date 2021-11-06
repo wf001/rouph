@@ -4,8 +4,9 @@ import (
 	"fmt"
 )
 
-var labelSeq = 0
 var argReg = []string{"rdi", "rsi", "rdx", "rcx", "r8", "r9"}
+var labelSeq = 0
+var funcName string
 
 func genAddr(node *Node) {
 	if node.Kind == ND_KIND_VAR {
@@ -119,13 +120,13 @@ func gen(node *Node) {
 		fmt.Printf("  call %s\n", node.Func)
 		fmt.Println("  add rsp, 8")
 
-		fmt.Printf(" .Lend%d:\n", seq)
+		fmt.Printf(".Lend%d:\n", seq)
 		fmt.Printf("  push rax\n")
 		return
 	case ND_KIND_RETURN:
 		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
-		fmt.Printf("  jmp .Lreturn\n")
+		fmt.Printf("  jmp .Lreturn.%s\n", funcName)
 		return
 	}
 	gen(node.Lhs)
@@ -180,21 +181,27 @@ func gen(node *Node) {
 	}
 	fmt.Println("  push rax")
 }
-func codegen(prg *Prg) {
+func codegen(prg *Function) {
 	Info("%s\n", "---------------------- instruction ---------------")
 	Info("%s\n", "")
 	fmt.Println(".intel_syntax noprefix")
-	fmt.Println(".global main")
-	fmt.Println("main:")
-	fmt.Println("  push rbp")
-	fmt.Println("  mov rbp, rsp")
-	fmt.Printf("  sub rsp, %d\n", prg.StackSize)
+	for fn := prg; fn != nil; fn = fn.Next {
+		fmt.Printf(".global %s\n", fn.Name)
+		fmt.Printf("%s:\n", fn.Name)
+		funcName = fn.Name
 
-	for node := prg.N; node != nil; node = node.Next {
-		gen(node)
+		fmt.Printf("  push rbp\n")
+		fmt.Printf("  mov rbp, rsp\n")
+		fmt.Printf("  sub rsp, %d\n", fn.StackSize)
+
+		for node := fn.N; node != nil; node = node.Next {
+			gen(node)
+		}
+		fmt.Printf(".Lreturn.%s:\n", funcName)
+		fmt.Println("  mov rsp, rbp")
+		fmt.Println("  pop rbp")
+		fmt.Println("  ret")
+
 	}
-	fmt.Println(".Lreturn:")
-	fmt.Println("  mov rsp, rbp")
-	fmt.Println("  pop rbp")
-	fmt.Println("  ret")
+
 }

@@ -7,12 +7,15 @@ func main() {
 	// parse
 	prg := Program(head.Next)
 
-	offset := 0
-	for v := prg.Locals; v != nil; v = v.Next {
-		offset += 8
-		v.Offset = offset
+	for fn := prg; fn != nil; fn = fn.Next {
+		offset := 0
+
+		for v := prg.Locals; v != nil; v = v.Next {
+			offset += 8
+			v.Offset = offset
+		}
+		prg.StackSize = offset
 	}
-	prg.StackSize = offset
 
 	Info("%s\n", "======== print node =========")
 	n := prg.N
