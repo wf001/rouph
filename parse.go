@@ -49,30 +49,72 @@ type Var struct {
 	Offset int
 }
 
-type Prg struct {
+type Function struct {
+	Next      *Function
+	Name      string
 	N         *Node
 	Locals    *Var
 	StackSize int
 }
 
-func Program(tok *Token) *Prg {
+func Program(tok *Token) *Function {
+	head := new(Function)
+	head.Next = nil
+	cur := head
+
+	for {
+		if tok.Kind == TK_KIND_EOF {
+			break
+		}
+		tok, cur.Next = function(tok)
+		cur = cur.Next
+	}
+	return head.Next
+}
+func function(tok *Token) (*Token, *Function) {
+	Info("%+v\n", tok)
+
 	Locals = nil
+
+	if tok.Kind != TK_IDENT {
+		panic("identifier not found")
+	}
+	name := tok.Str
+	tok = tok.Next
+
+	if tok.Val != "(" {
+		panic("( not found")
+	}
+	tok = tok.Next
+
+	if tok.Val != ")" {
+		panic(") not found")
+	}
+	tok = tok.Next
+
+	if tok.Val != "{" {
+		panic("{ not found")
+	}
+	tok = tok.Next
+
 	head := new(Node)
 	head.Next = nil
 	cur := head
 	for {
-		if tok.Kind == TK_KIND_EOF {
+		if tok.Val == "}" {
+			tok = tok.Next
 			break
 		}
 		tok, cur.Next = stmt(tok)
 		cur = cur.Next
 	}
 
-	prg := new(Prg)
-	prg.N = head.Next
-	prg.Locals = Locals
+	fn := new(Function)
+	fn.Name = name
+	fn.N = head.Next
+	fn.Locals = Locals
 
-	return prg
+	return tok, fn
 }
 func stmt(tok *Token) (*Token, *Node) {
 	Info("stmt : %+v\n", tok)
