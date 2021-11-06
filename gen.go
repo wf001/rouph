@@ -5,6 +5,7 @@ import (
 )
 
 var labelSeq = 0
+var argReg = []string{"rdi", "rsi", "rdx", "rcx", "r8", "r9"}
 
 func genAddr(node *Node) {
 	if node.Kind == ND_KIND_VAR {
@@ -94,6 +95,14 @@ func gen(node *Node) {
 		}
 		return
 	case ND_KIND_FUNCALL:
+		nargs := 0
+		for arg := node.Args; arg != nil; arg = arg.Next {
+			gen(arg)
+			nargs += 1
+		}
+		for i := nargs - 1; i >= 0; i -= 1 {
+			fmt.Printf("  pop %s\n", argReg[i])
+		}
 		fmt.Printf("  call %s\n", node.Func)
 		fmt.Printf("  push rax\n")
 		return

@@ -2,6 +2,12 @@
 cat <<EOF | gcc -xc -c -o tmp2.o -
 int ret10() { return 10;  }
 int ret100() { return 100;  }
+int add(int x, int y) { return x+y;  }
+int sub(int x, int y) { return x-y;  }
+
+int add6(int a, int b, int c, int d, int e, int f) {
+  return a+b+c+d+e+f;
+}
 EOF
 
 assert() {
@@ -25,10 +31,10 @@ assert() {
 }
 
 go build .
-# nasm -f elf64 tmp.s
-# ld -s -o tmp tmp.o
+#nasm -f elf64 tmp.s
+#ld -s -o tmp tmp.o
 
-#############
+############
 # Assertion
 #############
 assert 3 'return 3;'
@@ -116,6 +122,9 @@ assert 10 'i=0; for(i=0; ; i=i+1) if(i==10) return i;'
 assert 55 'i=0; j=0; for (i=0; i=<10; ) {j=i+j;  i=i+1;} return j;'
 assert 10 'return ret10();'
 assert 100 'return ret100();'
+assert 8 'return add(3, 5);'
+assert 2 'return sub(5, 3);'
+assert 21 'return add6(1,2,3,4,5,6);'
 
 rm -f tmp.s
 
