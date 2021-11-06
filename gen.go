@@ -54,19 +54,19 @@ func gen(node *Node) {
 			gen(node.Cond)
 			fmt.Println("  pop rax")
 			fmt.Println("  cmp rax, 0")
-			fmt.Printf("  je .Lelse%d\n", seq)
+			fmt.Printf("  je Lelse%d\n", seq)
 			gen(node.Then)
-			fmt.Printf("  je .Lend%d\n", seq)
-			fmt.Printf(".Lelse%d:\n", seq)
+			fmt.Printf("  je Lend%d\n", seq)
+			fmt.Printf("Lelse%d:\n", seq)
 			gen(node.Else)
-			fmt.Printf(".Lend%d:\n", seq)
+			fmt.Printf("Lend%d:\n", seq)
 		} else {
 			gen(node.Cond)
 			fmt.Println("  pop rax")
 			fmt.Println("  cmp rax,0")
-			fmt.Printf("  je .Lend%d\n", seq)
+			fmt.Printf("  je Lend%d\n", seq)
 			gen(node.Then)
-			fmt.Printf(".Lend%d:\n", seq)
+			fmt.Printf("Lend%d:\n", seq)
 		}
 		return
 	case ND_KIND_FOR:
@@ -75,19 +75,19 @@ func gen(node *Node) {
 		if node.Init != nil {
 			gen(node.Init)
 		}
-		fmt.Printf(".Lbegin%d:\n", seq)
+		fmt.Printf("Lbegin%d:\n", seq)
 		if node.Cond != nil {
 			gen(node.Cond)
 			fmt.Println("  pop rax")
 			fmt.Println("  cmp rax, 0")
-			fmt.Printf("  je .Lend%d\n", seq)
+			fmt.Printf("  je Lend%d\n", seq)
 		}
 		gen(node.Then)
 		if node.Inc != nil {
 			gen(node.Inc)
 		}
-		fmt.Printf("  jmp .Lbegin%d\n", seq)
-		fmt.Printf(".Lend%d:\n", seq)
+		fmt.Printf("  jmp Lbegin%d\n", seq)
+		fmt.Printf("Lend%d:\n", seq)
 		return
 	case ND_KIND_BLOCK:
 		for n := node.Body; n != nil; n = n.Next {
@@ -108,24 +108,24 @@ func gen(node *Node) {
 		labelSeq += 1
 		fmt.Println("  mov rax, rsp")
 		fmt.Println("  and rax, 15")
-		fmt.Printf("  jnz .Lcall%d\n", seq)
+		fmt.Printf("  jnz Lcall%d\n", seq)
 		fmt.Println("  mov rax, 0")
 		fmt.Printf("  call %s\n", node.Func)
-		fmt.Printf("  jmp .Lend%d\n", seq)
+		fmt.Printf("  jmp Lend%d\n", seq)
 
-		fmt.Printf(".Lcall%d:\n", seq)
+		fmt.Printf("Lcall%d:\n", seq)
 		fmt.Println("  sub rsp, 8")
 		fmt.Println("  mov rax, 0")
 		fmt.Printf("  call %s\n", node.Func)
 		fmt.Println("  add rsp, 8")
 
-		fmt.Printf(" .Lend%d:\n", seq)
+		fmt.Printf(" Lend%d:\n", seq)
 		fmt.Printf("  push rax\n")
 		return
 	case ND_KIND_RETURN:
 		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
-		fmt.Printf("  jmp .Lreturn\n")
+		fmt.Printf("  jmp Lreturn\n")
 		return
 	}
 	gen(node.Lhs)
@@ -149,33 +149,33 @@ func gen(node *Node) {
 		break
 	case ND_KIND_EQ:
 		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  mov rax, 0\n")
 		fmt.Printf("  sete al\n")
-		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_NE:
 		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  mov rax, 0\n")
 		fmt.Printf("  setne al\n")
-		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_LT:
 		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  mov rax, 0\n")
 		fmt.Printf("  setl al\n")
-		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_LE:
 		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  mov rax, 0\n")
 		fmt.Printf("  setle al\n")
-		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_GT:
 		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  mov rax, 0\n")
 		fmt.Printf("  setg al\n")
-		fmt.Printf("  movzb rax, al\n")
 		break
 	case ND_KIND_GE:
 		fmt.Printf("  cmp rax, rdi\n")
+		fmt.Printf("  mov rax, 0\n")
 		fmt.Printf("  setge al\n")
-		fmt.Printf("  movzb rax, al\n")
 		break
 	}
 	fmt.Println("  push rax")
@@ -183,9 +183,8 @@ func gen(node *Node) {
 func codegen(prg *Prg) {
 	Info("%s\n", "---------------------- instruction ---------------")
 	Info("%s\n", "")
-	fmt.Println(".intel_syntax noprefix")
-	fmt.Println(".global main")
-	fmt.Println("main:")
+	fmt.Println("global _start")
+	fmt.Println("_start:")
 	fmt.Println("  push rbp")
 	fmt.Println("  mov rbp, rsp")
 	fmt.Printf("  sub rsp, %d\n", prg.StackSize)
@@ -193,8 +192,9 @@ func codegen(prg *Prg) {
 	for node := prg.N; node != nil; node = node.Next {
 		gen(node)
 	}
-	fmt.Println(".Lreturn:")
-	fmt.Println("  mov rsp, rbp")
-	fmt.Println("  pop rbp")
+	fmt.Println("Lreturn:")
+	fmt.Println("  mov rbx, rax")
+	fmt.Println("  mov rax, 1")
+	fmt.Println("  int 0x80")
 	fmt.Println("  ret")
 }
