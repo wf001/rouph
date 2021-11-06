@@ -19,6 +19,7 @@ const (
 	ND_KIND_RETURN                        // return
 	ND_KIND_IF                            //if
 	ND_KIND_FOR                           //for
+	ND_KIND_BLOCK                         //{...}
 	ND_KIND_EXPR_STMT                     // Expression Statement
 	ND_KIND_VAR                           // Local Variables
 	ND_KIND_NUM                           // Integer
@@ -33,6 +34,7 @@ type Node struct {
 	Else *Node
 	Init *Node
 	Inc  *Node
+	Body *Node
 	Rhs  *Node
 	Var  *Var
 	Val  int
@@ -141,6 +143,25 @@ func stmt(tok *Token) (*Token, *Node) {
 		}
 		tok = tok.Next
 		tok, node.Then = stmt(tok)
+		return tok, node
+	}
+
+	if tok.Val == "{" {
+		tok = tok.Next
+		head := new(Node)
+		head.Next = nil
+		cur := head
+
+		for {
+			if tok.Val == "}" {
+				tok = tok.Next
+				break
+			}
+			tok, cur.Next = stmt(tok)
+			cur = cur.Next
+		}
+		node := newNode(ND_KIND_BLOCK, nil, nil)
+		node.Body = head.Next
 		return tok, node
 	}
 
