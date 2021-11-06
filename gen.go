@@ -88,6 +88,11 @@ func gen(node *Node) {
 		fmt.Printf("  jmp .Lbegin%d\n", seq)
 		fmt.Printf(".Lend%d:\n", seq)
 		return
+	case ND_KIND_BLOCK:
+		for n := node.Body; n != nil; n = n.Next {
+			gen(n)
+		}
+		return
 	case ND_KIND_RETURN:
 		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
