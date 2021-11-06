@@ -38,6 +38,7 @@ type Node struct {
 	Body *Node
 	Rhs  *Node
 	Func string
+	Args *Node
 	Var  *Var
 	Val  int
 }
@@ -318,12 +319,9 @@ func primary(tok *Token) (*Token, *Node) {
 		// function
 		if tok.Val == "(" {
 			tok = tok.Next
-			if tok.Val != ")" {
-				panic("Invalid closing.")
-			}
-			tok = tok.Next
 			node := newNode(ND_KIND_FUNCALL, nil, nil)
 			node.Func = i_tok.Str
+			tok, node.Args = funcArgs(tok)
 			return tok, node
 		}
 
@@ -431,4 +429,27 @@ func readExprStmt(tok *Token) (*Token, *Node) {
 	node := newNode(ND_KIND_EXPR_STMT, r_node, nil)
 	return tok, node
 
+}
+func funcArgs(tok *Token) (*Token, *Node) {
+	if tok.Val == ")" {
+		tok = tok.Next
+		return tok, nil
+	}
+	tok, head := assign(tok)
+	cur := head
+	for {
+		Info("%s\n", "for")
+		if tok.Val != "," {
+			break
+		}
+		tok = tok.Next
+
+		tok, cur.Next = assign(tok)
+		cur = cur.Next
+	}
+	if tok.Val != ")" {
+		panic("Invalid closing.")
+	}
+	tok = tok.Next
+	return tok, head
 }
