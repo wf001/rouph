@@ -1,22 +1,27 @@
 #!/bin/bash
+cat <<EOF | gcc -xc -c -o tmp2.o -
+int ret10() { return 10;  }
+int ret100() { return 100;  }
+EOF
+
 assert() {
-  expected="$1"
-  input="$2"
+    expected="$1"
+    input="$2"
 
-  ./crude-lang-go "$input" > tmp.s
-  gcc -static -o tmp tmp.s
-  ./tmp
-  actual="$?"
-  msg="OK"
-  code=0
+    ./crude-lang-go "$input" > tmp.s
+    gcc -static -o tmp tmp.s tmp2.o
+    ./tmp
+    actual="$?"
+    msg="OK"
+    code=0
 
-  if [ "$actual" = "$expected" ]; then
-    echo -e "\e[1;32mPASSED\e[0m : '$input' => $actual"
-  else
-    echo -e "\e[1;31mFAILED\e[0m : '$input' => $expected expected, but got $actual"
-    msg="NG"
-    code=-1
-  fi
+    if [ "$actual" = "$expected" ]; then
+        echo -e "\e[1;32mPASSED\e[0m : '$input' => $actual"
+    else
+        echo -e "\e[1;31mFAILED\e[0m : '$input' => $expected expected, but got $actual"
+        msg="NG"
+        code=-1
+    fi
 }
 
 go build .
@@ -109,6 +114,8 @@ assert 55 'i=0; j=0; for (i=0; i=<10; i=i+1) j=i+j; return j;'
 assert 3 'for (;;) return 3; return 5;'
 assert 10 'i=0; for(i=0; ; i=i+1) if(i==10) return i;'
 assert 55 'i=0; j=0; for (i=0; i=<10; ) {j=i+j;  i=i+1;} return j;'
+assert 10 'return ret10();'
+assert 100 'return ret100();'
 
 rm -f tmp.s
 

@@ -20,6 +20,7 @@ const (
 	ND_KIND_IF                            //if
 	ND_KIND_FOR                           //for
 	ND_KIND_BLOCK                         //{...}
+	ND_KIND_FUNCALL                       // function call
 	ND_KIND_EXPR_STMT                     // Expression Statement
 	ND_KIND_VAR                           // Local Variables
 	ND_KIND_NUM                           // Integer
@@ -36,6 +37,7 @@ type Node struct {
 	Inc  *Node
 	Body *Node
 	Rhs  *Node
+	Func string
 	Var  *Var
 	Val  int
 }
@@ -312,6 +314,20 @@ func primary(tok *Token) (*Token, *Node) {
 	if tok.Kind == TK_IDENT {
 		i_tok := tok
 		tok = tok.Next
+
+		// function
+		if tok.Val == "(" {
+			tok = tok.Next
+			if tok.Val != ")" {
+				panic("Invalid closing.")
+			}
+			tok = tok.Next
+			node := newNode(ND_KIND_FUNCALL, nil, nil)
+			node.Func = i_tok.Str
+			return tok, node
+		}
+
+		// variable
 		v := findVar(i_tok)
 		if v == nil {
 			v = pushVar(i_tok.Str)
