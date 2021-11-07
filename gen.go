@@ -49,6 +49,8 @@ func store() {
 
 func gen(node *Node) {
 	switch node.Kind {
+    case ND_KIND_NULL:
+        return
 	case ND_KIND_NUM:
 		fmt.Printf("  push %d\n", node.Val)
 		return
