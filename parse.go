@@ -79,7 +79,6 @@ func Program(tok *Token) *Function {
 }
 
 func function(tok *Token) (*Token, *Function) {
-	Info("%+v\n", tok)
 
 	Locals = nil
 
@@ -120,7 +119,6 @@ func function(tok *Token) (*Token, *Function) {
 	return tok, fn
 }
 func readFuncParams(tok *Token) (*Token, *VarList) {
-	Info("%+v\n", tok)
 	if tok.Val == ")" {
 		tok = tok.Next
 		return tok, nil
@@ -156,7 +154,6 @@ func readFuncParams(tok *Token) (*Token, *VarList) {
 }
 
 func stmt(tok *Token) (*Token, *Node) {
-	Info("stmt : %+v\n", tok)
 	if tok.Val == "return" {
 		tok = tok.Next
 		tok, e_node := expr(tok)
@@ -193,7 +190,6 @@ func stmt(tok *Token) (*Token, *Node) {
 		return tok, node
 	}
 	if tok.Str == "for" {
-		Info("%s\n", "for")
 		tok = tok.Next
 		node := newNode(ND_KIND_FOR, nil, nil)
 
@@ -219,7 +215,6 @@ func stmt(tok *Token) (*Token, *Node) {
 		tok = tok.Next
 
 		if tok.Val != ")" {
-			Info(") %+v\n", tok)
 			tok, node.Inc = readExprStmt(tok)
 			if tok.Val != ")" {
 				panic(") not found")
@@ -251,7 +246,6 @@ func stmt(tok *Token) (*Token, *Node) {
 
 	tok, node := readExprStmt(tok)
 
-	Info("tok :: %+v\n", tok)
 	if tok.Val != ";" {
 		panic("; not found")
 	}
@@ -275,12 +269,8 @@ func assign(tok *Token) (*Token, *Node) {
 }
 func equality(tok *Token) (*Token, *Node) {
 	var m_node *Node
-	Info("%s\n", "eq")
-	Info("%p\n", tok)
 	tok, node := relational(tok)
 	for {
-		Info("%s\n", "eq for")
-		Info("%s\n", tok.Val)
 		if tok.Val == "==" {
 			tok = tok.Next
 			tok, m_node = relational(tok)
@@ -296,12 +286,8 @@ func equality(tok *Token) (*Token, *Node) {
 }
 func relational(tok *Token) (*Token, *Node) {
 	var m_node *Node
-	Info("%s\n", "rel")
-	Info("%p\n", tok)
 	tok, node := add(tok)
 	for {
-		Info("%s\n", "rel for")
-		Info("%s\n", tok.Val)
 		if tok.Val == "<" {
 			tok = tok.Next
 			tok, m_node = add(tok)
@@ -326,12 +312,8 @@ func relational(tok *Token) (*Token, *Node) {
 
 func add(tok *Token) (*Token, *Node) {
 	var m_node *Node
-	Info("%s\n", "expr")
-	Info("%p\n", tok)
 	tok, node := mul(tok)
 	for {
-		Info("%s\n", "expr for")
-		Info("%s\n", tok.Val)
 		if tok.Val == "+" {
 			tok = tok.Next
 			tok, m_node = mul(tok)
@@ -347,12 +329,8 @@ func add(tok *Token) (*Token, *Node) {
 }
 func mul(tok *Token) (*Token, *Node) {
 	var p_node *Node
-	Info("%s\n", "mul")
-	Info("%p\n", tok)
 	tok, node := unary(tok)
 	for {
-		Info("%s\n", "mul for")
-		Info("%s\n", tok.Val)
 		if tok.Val == "*" {
 			tok = tok.Next
 			tok, p_node = unary(tok)
@@ -390,13 +368,9 @@ func unary(tok *Token) (*Token, *Node) {
 	return primary(tok)
 }
 func primary(tok *Token) (*Token, *Node) {
-	Info("%s\n", "pri")
-	Info("%p\n", tok)
-	Info("%s\n", tok.Val)
 	if tok.Val == "(" {
 		tok = tok.Next
 		tok, node := expr(tok)
-		Info("'%s'", tok.Val)
 		if tok.Val != ")" {
 			panic("invalid closing.")
 		}
@@ -460,41 +434,34 @@ func newNodeNum(val int) *Node {
 
 func printNode(node *Node) {
 	if DEBUG {
-		if node.Kind == ND_KIND_NUM {
-			Info("## node %p\n", node)
+		Info("##\x1b[32m node %p\x1b[0m\n", node)
+		switch node.Kind {
+
+		case ND_KIND_NUM:
 			Info("## %+v\n", node)
 			return
-		}
-		if node.Kind == ND_KIND_EXPR_STMT {
-			Info("## node %p\n", node)
+		case ND_KIND_EXPR_STMT:
 			Info("## %+v\n", node)
 			printNode(node.Lhs)
 			return
-		}
-		if node.Kind == ND_KIND_VAR {
-			Info("##\x1b[31m node %p\x1b[0m\n", node)
+		case ND_KIND_VAR:
 			Info("## %+v\n", node)
 			Info("->### var %p\n", node.Var)
 			Info("->### var %+v\n", node.Var)
 			return
-		}
-		if node.Kind == ND_KIND_ADDR {
+		case ND_KIND_ADDR:
 			printNode(node.Lhs)
 			return
-		}
-		if node.Kind == ND_KIND_DEREF {
+		case ND_KIND_DEREF:
 			printNode(node.Lhs)
 			return
-		}
-		if node.Kind == ND_KIND_FUNCALL {
+		case ND_KIND_FUNCALL:
 			for arg := node.Args; arg != nil; arg = arg.Next {
 				gen(arg)
 				printNode(arg)
 			}
 			return
-		}
-		if node.Kind == ND_KIND_FOR {
-			Info("## node %p\n", node)
+		case ND_KIND_FOR:
 			Info("## %+v\n", node)
 			Info("->### var %p\n", node.Var)
 			Info("->### var %+v\n", node.Var)
@@ -509,15 +476,12 @@ func printNode(node *Node) {
 				printNode(node.Inc)
 			}
 			return
-		}
-		if node.Kind == ND_KIND_ASSIGN {
-			Info("## node %p\n", node)
+		case ND_KIND_ASSIGN:
 			Info("## %+v\n", node)
 			printNode(node.Lhs)
 			printNode(node.Rhs)
 			return
-		}
-		if node.Kind == ND_KIND_IF {
+		case ND_KIND_IF:
 			if node.Else != nil {
 				gen(node.Cond)
 				gen(node.Then)
@@ -527,20 +491,16 @@ func printNode(node *Node) {
 				gen(node.Then)
 			}
 			return
-		}
-		if node.Kind == ND_KIND_BLOCK {
+		case ND_KIND_BLOCK:
 			for n := node.Body; n != nil; n = n.Next {
 				printNode(n)
 			}
 			return
-		}
-		if node.Kind == ND_KIND_RETURN {
-			Info("## node %p\n", node)
+		case ND_KIND_RETURN:
 			Info("## %+v\n", node)
 			printNode(node.Lhs)
 			return
 		}
-		Info("## node %p\n", node)
 		Info("## %+v\n", node)
 		printNode(node.Lhs)
 		printNode(node.Rhs)
@@ -569,7 +529,6 @@ func funcArgs(tok *Token) (*Token, *Node) {
 	tok, head := assign(tok)
 	cur := head
 	for {
-		Info("%s\n", "for")
 		if tok.Val != "," {
 			break
 		}

@@ -34,7 +34,7 @@ func printToken(tok *Token) {
 	if DEBUG {
 		fmt.Println("============= print token =============")
 		for ; tok != nil; tok = tok.Next {
-			Info("tok %p\n", tok)
+			Info("##\x1b[36m tok %p\x1b[0m\n", tok)
 			Info("%+v\n", tok)
 		}
 		fmt.Println("==========================")
@@ -79,9 +79,8 @@ func TokenizeHandler() *Token {
 	cur := head
 
 	//tokenize
-	Info("arg_arr:%+v\n", arg_arr)
+	Info("arg_arr:%#v\n", arg_arr)
 	for _, s := range arg_arr {
-		Info("%s\n", s)
 		if _, res := isReserved(s); res {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
 		} else if s == "return" {
@@ -102,7 +101,6 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 		arr = appendIfExists(arr, number, valName)
 		return arr
 	}
-	Info("Scan %s\n", string(input[i:]))
 	// if input[i] is space, it skipped
 	if string(input[i]) == " " {
 		arr = appendIfExists(arr, number, valName)
@@ -181,7 +179,5 @@ func isAlpha(c rune) bool {
 }
 func isAlphaNum(c rune) bool {
 	res := isAlpha(c) || (rune('0') <= c && c <= rune('9'))
-	Info("isAlphaNum:%d\n", res)
-	Info("c:%s\n", string(c))
 	return res
 }
