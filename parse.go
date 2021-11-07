@@ -1,8 +1,11 @@
 package main
 
-type NodeKind int
-
 var Locals *VarList
+
+/*
+* Node
+ */
+type NodeKind int
 
 const (
 	ND_KIND_ADD       NodeKind = iota + 1 // +
@@ -31,6 +34,7 @@ const (
 type Node struct {
 	Kind NodeKind
 	Next *Node
+	Ty   *Type
 	Lhs  *Node
 	Rhs  *Node
 	Cond *Node
@@ -439,6 +443,7 @@ func printNode(node *Node) {
 
 		case ND_KIND_NUM:
 			Info("## %+v\n", node)
+			Info("## type -> %+v\n", node.Ty)
 			return
 		case ND_KIND_EXPR_STMT:
 			Info("## %+v\n", node)

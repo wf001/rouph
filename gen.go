@@ -8,6 +8,21 @@ var argReg = []string{"rdi", "rsi", "rdx", "rcx", "r8", "r9"}
 var labelSeq = 0
 var funcName string
 
+/*
+* Type
+ */
+type TypeKind int
+
+const (
+	TY_INT TypeKind = iota + 1 // +
+	TY_PTR
+)
+
+type Type struct {
+	Kind TypeKind
+	Base *Type
+}
+
 func genAddr(node *Node) {
 	switch node.Kind {
 	case ND_KIND_VAR:
@@ -147,9 +162,15 @@ func gen(node *Node) {
 
 	switch node.Kind {
 	case ND_KIND_ADD:
+		if node.Ty.Kind == TY_PTR {
+			fmt.Printf("  imul rdi, 8\n")
+		}
 		fmt.Printf("  add rax, rdi\n")
 		break
 	case ND_KIND_SUB:
+		if node.Ty.Kind == TY_PTR {
+			fmt.Printf("  imul rdi, 8\n")
+		}
 		fmt.Printf("  sub rax, rdi\n")
 		break
 	case ND_KIND_MUL:
