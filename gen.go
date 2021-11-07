@@ -9,9 +9,13 @@ var labelSeq = 0
 var funcName string
 
 func genAddr(node *Node) {
-	if node.Kind == ND_KIND_VAR {
+	switch node.Kind {
+	case ND_KIND_VAR:
 		fmt.Printf("  lea rax, [rbp-%d]\n", node.Var.Offset)
 		fmt.Println("  push rax")
+		return
+	case ND_KIND_DEREF:
+		gen(node.Lhs)
 		return
 	}
 	panic("not an local value.")
@@ -47,6 +51,13 @@ func gen(node *Node) {
 		// push right side val
 		gen(node.Rhs)
 		store()
+		return
+	case ND_KIND_ADDR:
+		genAddr(node.Lhs)
+		return
+	case ND_KIND_DEREF:
+		gen(node.Lhs)
+		load()
 		return
 	case ND_KIND_IF:
 		var seq = labelSeq

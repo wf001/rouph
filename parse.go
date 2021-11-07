@@ -15,11 +15,13 @@ const (
 	ND_KIND_LE                            // =<
 	ND_KIND_GT                            // >
 	ND_KIND_GE                            // >=
-	ND_KIND_ASSIGN                        //=
+	ND_KIND_ASSIGN                        // =
+	ND_KIND_ADDR                          // unary &
+	ND_KIND_DEREF                         // unary *
 	ND_KIND_RETURN                        // return
-	ND_KIND_IF                            //if
-	ND_KIND_FOR                           //for
-	ND_KIND_BLOCK                         //{...}
+	ND_KIND_IF                            // if
+	ND_KIND_FOR                           // for
+	ND_KIND_BLOCK                         // {...}
 	ND_KIND_FUNCALL                       // function call
 	ND_KIND_EXPR_STMT                     // Expression Statement
 	ND_KIND_VAR                           // Local Variables
@@ -368,11 +370,22 @@ func unary(tok *Token) (*Token, *Node) {
 	var u_node *Node
 	if tok.Val == "+" {
 		tok = tok.Next
-		return primary(tok)
-	} else if tok.Val == "-" {
+		return unary(tok)
+	}
+	if tok.Val == "-" {
 		tok = tok.Next
-		tok, u_node = primary(tok)
+		tok, u_node = unary(tok)
 		return tok, newNode(ND_KIND_SUB, newNodeNum(0), u_node)
+	}
+	if tok.Val == "&" {
+		tok = tok.Next
+		tok, u_node = unary(tok)
+		return tok, newNode(ND_KIND_ADDR, u_node, nil)
+	}
+	if tok.Val == "*" {
+		tok = tok.Next
+		tok, u_node = unary(tok)
+		return tok, newNode(ND_KIND_DEREF, u_node, nil)
 	}
 	return primary(tok)
 }
@@ -459,10 +472,18 @@ func printNode(node *Node) {
 			return
 		}
 		if node.Kind == ND_KIND_VAR {
-			Info("## node %p\n", node)
+			Info("##\x1b[31m node %p\x1b[0m\n", node)
 			Info("## %+v\n", node)
 			Info("->### var %p\n", node.Var)
 			Info("->### var %+v\n", node.Var)
+			return
+		}
+		if node.Kind == ND_KIND_ADDR {
+			printNode(node.Lhs)
+			return
+		}
+		if node.Kind == ND_KIND_DEREF {
+			printNode(node.Lhs)
 			return
 		}
 		if node.Kind == ND_KIND_FUNCALL {

@@ -132,6 +132,14 @@ assert 11 'main() { return myadd3(5,6); } myadd3(x,y) { return x+y; }'
 assert 7 'main() { return myadd4(1,6); } myadd4(x,y) { return x+y; }'
 assert 17 'main() { return myadd5(11,6); } myadd5(x,y) { return x+y; }'
 assert 89 'main(){return fib(11);} fib(n){if(n==1)return 1;if(n==2) return 1; return fib(n-1)+fib(n-2);}'
+assert 3 'main() { x=3; return *&x;  }'
+assert 4 'main() { x=3; y=&x; x=4; return *y;  }'
+assert 3 'main() { x=3; y=&x; z=&y; return **z;  }'
+assert 5 'main() { x=3; y=5; return *(&x+8);  }'
+assert 3 'main() { x=3; y=5; return *(&y-8);  }'
+assert 5 'main() { x=3; y=&x; *y=5; return x;  }'
+assert 7 'main() { x=3; y=5; *(&x+8)=7; return y;  }'
+assert 7 'main() { x=3; y=5; *(&y-8)=7; return x;  }'
 
 rm -f tmp.s
 
