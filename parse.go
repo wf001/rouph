@@ -2,7 +2,7 @@ package main
 
 type NodeKind int
 
-var Locals *Var
+var Locals *VarList
 
 const (
 	ND_KIND_ADD       NodeKind = iota + 1 // +
@@ -30,13 +30,13 @@ type Node struct {
 	Kind NodeKind
 	Next *Node
 	Lhs  *Node
+	Rhs  *Node
 	Cond *Node
 	Then *Node
 	Else *Node
 	Init *Node
 	Inc  *Node
 	Body *Node
-	Rhs  *Node
 	Func string
 	Args *Node
 	Var  *Var
@@ -44,16 +44,20 @@ type Node struct {
 }
 
 type Var struct {
-	Next   *Var
 	Name   string
 	Offset int
+}
+type VarList struct {
+	Next *VarList
+	V    *Var
 }
 
 type Function struct {
 	Next      *Function
 	Name      string
 	N         *Node
-	Locals    *Var
+	Params    *VarList
+	Locals    *VarList
 	StackSize int
 }
 
@@ -71,15 +75,17 @@ func Program(tok *Token) *Function {
 	}
 	return head.Next
 }
+
 func function(tok *Token) (*Token, *Function) {
 	Info("%+v\n", tok)
 
 	Locals = nil
 
+	fn := new(Function)
 	if tok.Kind != TK_IDENT {
 		panic("identifier not found")
 	}
-	name := tok.Str
+	fn.Name = tok.Str
 	tok = tok.Next
 
 	if tok.Val != "(" {
@@ -87,10 +93,7 @@ func function(tok *Token) (*Token, *Function) {
 	}
 	tok = tok.Next
 
-	if tok.Val != ")" {
-		panic(") not found")
-	}
-	tok = tok.Next
+	tok, fn.Params = readFuncParams(tok)
 
 	if tok.Val != "{" {
 		panic("{ not found")
@@ -109,13 +112,47 @@ func function(tok *Token) (*Token, *Function) {
 		cur = cur.Next
 	}
 
-	fn := new(Function)
-	fn.Name = name
 	fn.N = head.Next
 	fn.Locals = Locals
 
 	return tok, fn
 }
+func readFuncParams(tok *Token) (*Token, *VarList) {
+	Info("%+v\n", tok)
+	if tok.Val == ")" {
+		tok = tok.Next
+		return tok, nil
+	}
+	head := new(VarList)
+	if tok.Kind != TK_IDENT {
+		panic("not found identifier.")
+	}
+
+	head.V = pushVar(tok.Str)
+	tok = tok.Next
+	cur := head
+
+	for {
+		if tok.Val == ")" {
+			break
+		}
+		if tok.Val != "," {
+			panic("not found ','")
+		}
+		tok = tok.Next
+		cur.Next = new(VarList)
+		if tok.Kind != TK_IDENT {
+			panic("not found identifier.")
+		}
+		cur.Next.V = pushVar(tok.Str)
+		tok = tok.Next
+		cur = cur.Next
+	}
+	tok = tok.Next
+	return tok, head
+
+}
+
 func stmt(tok *Token) (*Token, *Node) {
 	Info("stmt : %+v\n", tok)
 	if tok.Val == "return" {
@@ -393,9 +430,12 @@ func newVar(v *Var) *Node {
 }
 func pushVar(name string) *Var {
 	v := new(Var)
-	v.Next = Locals
 	v.Name = name
-	Locals = v
+
+	vl := new(VarList)
+	vl.V = v
+	vl.Next = Locals
+	Locals = vl
 	return v
 }
 func newNodeNum(val int) *Node {
@@ -425,6 +465,30 @@ func printNode(node *Node) {
 			Info("->### var %+v\n", node.Var)
 			return
 		}
+		if node.Kind == ND_KIND_FUNCALL {
+			for arg := node.Args; arg != nil; arg = arg.Next {
+				gen(arg)
+				printNode(arg)
+			}
+			return
+		}
+		if node.Kind == ND_KIND_FOR {
+			Info("## node %p\n", node)
+			Info("## %+v\n", node)
+			Info("->### var %p\n", node.Var)
+			Info("->### var %+v\n", node.Var)
+			if node.Init != nil {
+				printNode(node.Init)
+			}
+			if node.Cond != nil {
+				printNode(node.Cond)
+			}
+			gen(node.Then)
+			if node.Inc != nil {
+				printNode(node.Inc)
+			}
+			return
+		}
 		if node.Kind == ND_KIND_ASSIGN {
 			Info("## node %p\n", node)
 			Info("## %+v\n", node)
@@ -443,6 +507,12 @@ func printNode(node *Node) {
 			}
 			return
 		}
+		if node.Kind == ND_KIND_BLOCK {
+			for n := node.Body; n != nil; n = n.Next {
+				printNode(n)
+			}
+			return
+		}
 		if node.Kind == ND_KIND_RETURN {
 			Info("## node %p\n", node)
 			Info("## %+v\n", node)
@@ -457,11 +527,9 @@ func printNode(node *Node) {
 }
 
 func findVar(tok *Token) *Var {
-	for v := Locals; v != nil; v = v.Next {
-		Info("findVar:%s\n", v.Name)
-		Info("findVar:%s\n", tok.Str)
-		if v.Name == tok.Str {
-			return v
+	for vl := Locals; vl != nil; vl = vl.Next {
+		if vl.V.Name == tok.Str {
+			return vl.V
 		}
 	}
 	return nil

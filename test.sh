@@ -126,6 +126,12 @@ assert 8 'main(){return add(3, 5);}'
 assert 2 'main(){return sub(5, 3);}'
 assert 21 'main(){return add6(1,2,3,4,5,6);}'
 assert 32 'main() { return ret32();  } ret32() { return 32;  }'
+assert 9 'main() { return myadd(5,4); } myadd(x,y) { return x+y; }'
+assert 10 'main() { return myadd2(4,6); } myadd2(x,y) { return x+y; }'
+assert 11 'main() { return myadd3(5,6); } myadd3(x,y) { return x+y; }'
+assert 7 'main() { return myadd4(1,6); } myadd4(x,y) { return x+y; }'
+assert 17 'main() { return myadd5(11,6); } myadd5(x,y) { return x+y; }'
+assert 89 'main(){return fib(11);} fib(n){if(n==1)return 1;if(n==2) return 1; return fib(n-1)+fib(n-2);}'
 
 rm -f tmp.s
 
