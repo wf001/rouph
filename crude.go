@@ -6,6 +6,9 @@ func main() {
 	printToken(head)
 	// parse
 	prg := Program(head.Next)
+	Info("%+v\n", prg)
+	addType(prg)
+	Info("%+v\n", prg)
 
 	for fn := prg; fn != nil; fn = fn.Next {
 		offset := 0
