@@ -194,6 +194,13 @@ func codegen(prg *Function) {
 		fmt.Printf("  mov rbp, rsp\n")
 		fmt.Printf("  sub rsp, %d\n", fn.StackSize)
 
+		i := 0
+		for vl := fn.Params; vl != nil; vl = vl.Next {
+			v := vl.V
+			fmt.Printf("  mov [rbp-%d], %s\n", v.Offset, argReg[i])
+			i += 1
+		}
+
 		for node := fn.N; node != nil; node = node.Next {
 			gen(node)
 		}

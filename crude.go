@@ -10,18 +10,20 @@ func main() {
 	for fn := prg; fn != nil; fn = fn.Next {
 		offset := 0
 
-		for v := prg.Locals; v != nil; v = v.Next {
+		for vl := fn.Locals; vl != nil; vl = vl.Next {
 			offset += 8
-			v.Offset = offset
+			vl.V.Offset = offset
 		}
-		prg.StackSize = offset
+		fn.StackSize = offset
 	}
 
 	Info("%s\n", "======== print node =========")
-	n := prg.N
-	for ; n != nil; n = n.Next {
-		printNode(n)
-		Info("%s\n", "## [ref next]")
+	for fn := prg; fn != nil; fn = fn.Next {
+		n := fn.N
+		for ; n != nil; n = n.Next {
+			printNode(n)
+			Info("%s\n", "## [ref next]")
+		}
 	}
 	Info("%s\n", "=================")
 	// generate
