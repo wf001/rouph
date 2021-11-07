@@ -29,6 +29,7 @@ const (
 	ND_KIND_EXPR_STMT                     // Expression Statement
 	ND_KIND_VAR                           // Local Variables
 	ND_KIND_NUM                           // Integer
+	ND_KIND_NULL                          // null
 )
 
 type Node struct {
@@ -51,6 +52,7 @@ type Node struct {
 
 type Var struct {
 	Name   string
+	Ty     *Type
 	Offset int
 }
 type VarList struct {
@@ -68,6 +70,7 @@ type Function struct {
 }
 
 func Program(tok *Token) *Function {
+	printTokenAndeNode("program", tok)
 	head := new(Function)
 	head.Next = nil
 	cur := head
@@ -83,10 +86,12 @@ func Program(tok *Token) *Function {
 }
 
 func function(tok *Token) (*Token, *Function) {
+	printTokenAndeNode("function", tok)
 
 	Locals = nil
 
 	fn := new(Function)
+	tok, _ = baseType(tok)
 	if tok.Kind != TK_IDENT {
 		panic("identifier not found")
 	}
@@ -122,18 +127,72 @@ func function(tok *Token) (*Token, *Function) {
 
 	return tok, fn
 }
+
+func declaration(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("declaration", tok)
+	tok, ty := baseType(tok)
+	if tok.Kind != TK_IDENT {
+		panic("identifier not found.")
+	}
+	v := pushVar(tok.Str, ty)
+	tok = tok.Next
+
+	if tok.Val == ";" {
+		tok = tok.Next
+		return tok, newNode(ND_KIND_NULL, nil, nil)
+	}
+
+	if tok.Val != "=" {
+		panic("= not found.")
+	}
+	tok = tok.Next
+	Lhs := newVar(v)
+	tok, Rhs := expr(tok)
+	if tok.Val != ";" {
+		panic("; not found.")
+	}
+	tok = tok.Next
+	node := newNode(ND_KIND_ASSIGN, Lhs, Rhs)
+
+	return tok, newNode(ND_KIND_EXPR_STMT, node, nil)
+
+}
+
+func baseType(tok *Token) (*Token, *Type) {
+	if tok.Str != "int" {
+		panic("not found int.")
+	}
+	tok = tok.Next
+	ty := intType()
+	for {
+		if tok.Val != "*" {
+			break
+		}
+		tok = tok.Next
+		ty = pointerTo(ty)
+	}
+	return tok, ty
+}
+
+func readFuncParam(tok *Token) (*Token, *VarList) {
+	vl := new(VarList)
+	tok, ty := baseType(tok)
+	if tok.Kind != TK_IDENT {
+		panic("not found identifier.")
+	}
+
+	vl.V = pushVar(tok.Str, ty)
+	tok = tok.Next
+	return tok, vl
+}
+
 func readFuncParams(tok *Token) (*Token, *VarList) {
 	if tok.Val == ")" {
 		tok = tok.Next
 		return tok, nil
 	}
-	head := new(VarList)
-	if tok.Kind != TK_IDENT {
-		panic("not found identifier.")
-	}
 
-	head.V = pushVar(tok.Str)
-	tok = tok.Next
+	tok, head := readFuncParam(tok)
 	cur := head
 
 	for {
@@ -144,12 +203,7 @@ func readFuncParams(tok *Token) (*Token, *VarList) {
 			panic("not found ','")
 		}
 		tok = tok.Next
-		cur.Next = new(VarList)
-		if tok.Kind != TK_IDENT {
-			panic("not found identifier.")
-		}
-		cur.Next.V = pushVar(tok.Str)
-		tok = tok.Next
+		tok, cur.Next = readFuncParam(tok)
 		cur = cur.Next
 	}
 	tok = tok.Next
@@ -158,6 +212,7 @@ func readFuncParams(tok *Token) (*Token, *VarList) {
 }
 
 func stmt(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("stmt", tok)
 	if tok.Val == "return" {
 		tok = tok.Next
 		tok, e_node := expr(tok)
@@ -248,6 +303,10 @@ func stmt(tok *Token) (*Token, *Node) {
 		return tok, node
 	}
 
+	if tok.Str == "int" {
+		return declaration(tok)
+	}
+
 	tok, node := readExprStmt(tok)
 
 	if tok.Val != ";" {
@@ -257,9 +316,11 @@ func stmt(tok *Token) (*Token, *Node) {
 	return tok, node
 }
 func expr(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("expr", tok)
 	return assign(tok)
 }
 func assign(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("assign", tok)
 	var a_node *Node
 	tok, node := equality(tok)
 	if tok.Val == "=" {
@@ -272,6 +333,7 @@ func assign(tok *Token) (*Token, *Node) {
 	return tok, node
 }
 func equality(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("equality", tok)
 	var m_node *Node
 	tok, node := relational(tok)
 	for {
@@ -289,6 +351,7 @@ func equality(tok *Token) (*Token, *Node) {
 	}
 }
 func relational(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("relational", tok)
 	var m_node *Node
 	tok, node := add(tok)
 	for {
@@ -315,6 +378,7 @@ func relational(tok *Token) (*Token, *Node) {
 }
 
 func add(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("add", tok)
 	var m_node *Node
 	tok, node := mul(tok)
 	for {
@@ -332,6 +396,7 @@ func add(tok *Token) (*Token, *Node) {
 	}
 }
 func mul(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("mul", tok)
 	var p_node *Node
 	tok, node := unary(tok)
 	for {
@@ -349,6 +414,7 @@ func mul(tok *Token) (*Token, *Node) {
 	}
 }
 func unary(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("unary", tok)
 	var u_node *Node
 	if tok.Val == "+" {
 		tok = tok.Next
@@ -372,6 +438,7 @@ func unary(tok *Token) (*Token, *Node) {
 	return primary(tok)
 }
 func primary(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("primary", tok)
 	if tok.Val == "(" {
 		tok = tok.Next
 		tok, node := expr(tok)
@@ -398,7 +465,7 @@ func primary(tok *Token) (*Token, *Node) {
 		// variable
 		v := findVar(i_tok)
 		if v == nil {
-			v = pushVar(i_tok.Str)
+			panic("undefined variable.")
 		}
 		return tok, newVar(v)
 	} else {
@@ -419,9 +486,10 @@ func newVar(v *Var) *Node {
 	node.Var = v
 	return node
 }
-func pushVar(name string) *Var {
+func pushVar(name string, ty *Type) *Var {
 	v := new(Var)
 	v.Name = name
+	v.Ty = ty
 
 	vl := new(VarList)
 	vl.V = v
@@ -547,4 +615,11 @@ func funcArgs(tok *Token) (*Token, *Node) {
 	}
 	tok = tok.Next
 	return tok, head
+}
+func printTokenAndeNode(name string, tok *Token) {
+	if DEBUG {
+		sep()
+		Info("##\x1b[33m %s\x1b[0m\n", name)
+		Info("## tok %+v\n", tok)
+	}
 }

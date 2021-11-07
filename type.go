@@ -40,10 +40,12 @@ func visit(node *Node) {
 		ND_KIND_LT,
 		ND_KIND_GE,
 		ND_KIND_GT,
-		ND_KIND_VAR,
 		ND_KIND_FUNCALL,
 		ND_KIND_NUM:
 		node.Ty = intType()
+		return
+	case ND_KIND_VAR:
+		node.Ty = node.Var.Ty
 		return
 	case ND_KIND_ADD:
 		if node.Rhs.Ty.Kind == TY_PTR {
@@ -69,11 +71,10 @@ func visit(node *Node) {
 		node.Ty = pointerTo(node.Lhs.Ty)
 		return
 	case ND_KIND_DEREF:
-		if node.Lhs.Ty.Kind == TY_PTR {
-			node.Ty = node.Lhs.Ty.Base
-		} else {
-			node.Ty = intType()
+		if node.Lhs.Ty.Kind != TY_PTR {
+			panic("Invalid pointer dereference")
 		}
+		node.Ty = node.Lhs.Ty.Base
 		return
 	}
 }
