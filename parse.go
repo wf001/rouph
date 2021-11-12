@@ -157,60 +157,6 @@ func declaration(tok *Token) (*Token, *Node) {
 	return tok, newNode(ND_KIND_EXPR_STMT, node, nil)
 
 }
-
-func baseType(tok *Token) (*Token, *Type) {
-	if tok.Str != "int" {
-		panic("not found int.")
-	}
-	tok = tok.Next
-	ty := intType()
-	for {
-		if tok.Val != "*" {
-			break
-		}
-		tok = tok.Next
-		ty = pointerTo(ty)
-	}
-	return tok, ty
-}
-
-func readFuncParam(tok *Token) (*Token, *VarList) {
-	vl := new(VarList)
-	tok, ty := baseType(tok)
-	if tok.Kind != TK_IDENT {
-		panic("not found identifier.")
-	}
-
-	vl.V = pushVar(tok.Str, ty)
-	tok = tok.Next
-	return tok, vl
-}
-
-func readFuncParams(tok *Token) (*Token, *VarList) {
-	if tok.Val == ")" {
-		tok = tok.Next
-		return tok, nil
-	}
-
-	tok, head := readFuncParam(tok)
-	cur := head
-
-	for {
-		if tok.Val == ")" {
-			break
-		}
-		if tok.Val != "," {
-			panic("not found ','")
-		}
-		tok = tok.Next
-		tok, cur.Next = readFuncParam(tok)
-		cur = cur.Next
-	}
-	tok = tok.Next
-	return tok, head
-
-}
-
 func stmt(tok *Token) (*Token, *Node) {
 	printTokenAndeNode("stmt", tok)
 	if tok.Val == "return" {
@@ -315,6 +261,8 @@ func stmt(tok *Token) (*Token, *Node) {
 	tok = tok.Next
 	return tok, node
 }
+
+
 func expr(tok *Token) (*Token, *Node) {
 	printTokenAndeNode("expr", tok)
 	return assign(tok)
@@ -622,4 +570,57 @@ func printTokenAndeNode(name string, tok *Token) {
 		Info("##\x1b[33m %s\x1b[0m\n", name)
 		Info("## tok %+v\n", tok)
 	}
+}
+
+func baseType(tok *Token) (*Token, *Type) {
+	if tok.Str != "int" {
+		panic("not found int.")
+	}
+	tok = tok.Next
+	ty := intType()
+	for {
+		if tok.Val != "*" {
+			break
+		}
+		tok = tok.Next
+		ty = pointerTo(ty)
+	}
+	return tok, ty
+}
+
+func readFuncParam(tok *Token) (*Token, *VarList) {
+	vl := new(VarList)
+	tok, ty := baseType(tok)
+	if tok.Kind != TK_IDENT {
+		panic("not found identifier.")
+	}
+
+	vl.V = pushVar(tok.Str, ty)
+	tok = tok.Next
+	return tok, vl
+}
+
+func readFuncParams(tok *Token) (*Token, *VarList) {
+	if tok.Val == ")" {
+		tok = tok.Next
+		return tok, nil
+	}
+
+	tok, head := readFuncParam(tok)
+	cur := head
+
+	for {
+		if tok.Val == ")" {
+			break
+		}
+		if tok.Val != "," {
+			panic("not found ','")
+		}
+		tok = tok.Next
+		tok, cur.Next = readFuncParam(tok)
+		cur = cur.Next
+	}
+	tok = tok.Next
+	return tok, head
+
 }
