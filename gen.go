@@ -16,11 +16,13 @@ type TypeKind int
 const (
 	TY_INT TypeKind = iota + 1 // +
 	TY_PTR
+	TY_ARRAY
 )
 
 type Type struct {
-	Kind TypeKind
-	Base *Type
+	Kind      TypeKind
+	Base      *Type
+	arraySize int
 }
 
 func genAddr(node *Node) {
@@ -34,6 +36,12 @@ func genAddr(node *Node) {
 		return
 	}
 	panic("not an local value.")
+}
+func genLval(node *Node) {
+	if node.Ty.Kind == TY_ARRAY {
+		panic("not a local value.")
+	}
+	genAddr(node)
 }
 func load() {
 	fmt.Println("  pop rax")
@@ -49,8 +57,8 @@ func store() {
 
 func gen(node *Node) {
 	switch node.Kind {
-    case ND_KIND_NULL:
-        return
+	case ND_KIND_NULL:
+		return
 	case ND_KIND_NUM:
 		fmt.Printf("  push %d\n", node.Val)
 		return
@@ -60,11 +68,13 @@ func gen(node *Node) {
 		return
 	case ND_KIND_VAR:
 		genAddr(node)
-		load()
+		if node.Ty.Kind != TY_ARRAY {
+			load()
+		}
 		return
 	case ND_KIND_ASSIGN:
 		// push local val address
-		genAddr(node.Lhs)
+		genLval(node.Lhs)
 		// push right side val
 		gen(node.Rhs)
 		store()
@@ -74,7 +84,9 @@ func gen(node *Node) {
 		return
 	case ND_KIND_DEREF:
 		gen(node.Lhs)
-		load()
+		if node.Ty.Kind != TY_ARRAY {
+			load()
+		}
 		return
 	case ND_KIND_IF:
 		var seq = labelSeq
@@ -164,8 +176,8 @@ func gen(node *Node) {
 
 	switch node.Kind {
 	case ND_KIND_ADD:
-		if node.Ty.Kind == TY_PTR {
-			fmt.Printf("  imul rdi, 8\n")
+		if node.Ty.Base != nil {
+			fmt.Printf("  imul rdi, %d\n", sizeOf(node.Ty.Base))
 		}
 		fmt.Printf("  add rax, rdi\n")
 		break

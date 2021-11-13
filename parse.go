@@ -589,14 +589,16 @@ func baseType(tok *Token) (*Token, *Type) {
 }
 
 func readFuncParam(tok *Token) (*Token, *VarList) {
-	vl := new(VarList)
 	tok, ty := baseType(tok)
 	if tok.Kind != TK_IDENT {
 		panic("not found identifier.")
 	}
+    name := tok.Str
+    tok = tok.Next
+    tok, ty = readTypeSuffix(tok, ty)
 
-	vl.V = pushVar(tok.Str, ty)
-	tok = tok.Next
+	vl := new(VarList)
+	vl.V = pushVar(name, ty)
 	return tok, vl
 }
 
@@ -623,4 +625,20 @@ func readFuncParams(tok *Token) (*Token, *VarList) {
 	tok = tok.Next
 	return tok, head
 
+}
+func readTypeSuffix(tok *Token, base *Type) (*Token, *Type){
+    if tok.Val != "[" {
+        return tok, base
+    }
+    tok = tok.Next
+    if tok.Kind != TK_KIND_NUM {
+        panic("not number")
+    }
+    sz := tok.Val
+    tok = tok.Next
+    if tok.Val != "]" {
+        panic("not number")
+    }
+    tok, base = readTypeSuffix(tok, base)
+    return arrayOf(base,sz)
 }
