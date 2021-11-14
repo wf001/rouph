@@ -11,6 +11,22 @@ func pointerTo(base *Type) *Type {
 	t.Base = base
 	return t
 }
+func arrayOf(base *Type, size int) *Type {
+	ty := new(Type)
+	ty.Kind = TY_ARRAY
+	ty.Base = base
+	ty.ArraySize = size
+	return ty
+}
+func sizeOf(ty *Type) int {
+	if ty.Kind == TY_INT || ty.Kind == TY_PTR {
+		return 8
+	}
+	if ty.Kind != TY_ARRAY {
+		panic("type is allowed only array.")
+	}
+	return sizeOf(ty.Base) * ty.ArraySize
+}
 
 func visit(node *Node) {
 	if node == nil {
@@ -48,18 +64,18 @@ func visit(node *Node) {
 		node.Ty = node.Var.Ty
 		return
 	case ND_KIND_ADD:
-		if node.Rhs.Ty.Kind == TY_PTR {
+		if node.Rhs.Ty.Base != nil {
 			tmp := node.Lhs
 			node.Lhs = node.Rhs
 			node.Rhs = tmp
 		}
-		if node.Rhs.Ty.Kind == TY_PTR {
+		if node.Rhs.Ty.Base != nil {
 			panic("invalid token")
 		}
 		node.Ty = node.Lhs.Ty
 		return
 	case ND_KIND_SUB:
-		if node.Rhs.Ty.Kind == TY_PTR {
+		if node.Rhs.Ty.Base != nil {
 			panic("invalid token")
 		}
 		node.Ty = node.Lhs.Ty
@@ -69,9 +85,14 @@ func visit(node *Node) {
 		return
 	case ND_KIND_ADDR:
 		node.Ty = pointerTo(node.Lhs.Ty)
+		if node.Lhs.Ty.Kind == TY_ARRAY {
+			node.Ty = pointerTo(node.Lhs.Ty.Base)
+		} else {
+			node.Ty = pointerTo(node.Lhs.Ty)
+		}
 		return
 	case ND_KIND_DEREF:
-		if node.Lhs.Ty.Kind != TY_PTR {
+		if node.Lhs.Ty.Base == nil {
 			panic("Invalid pointer dereference")
 		}
 		node.Ty = node.Lhs.Ty.Base

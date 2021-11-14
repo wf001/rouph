@@ -22,7 +22,7 @@ const (
 type Type struct {
 	Kind      TypeKind
 	Base      *Type
-	arraySize int
+	ArraySize int
 }
 
 func genAddr(node *Node) {
