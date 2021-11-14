@@ -53,6 +53,8 @@ assert 8 'int main(){return  24 - 20 + (6- 4)*2;}'
 assert 8 'int main(){return   24 -20 + ( 6- 4)*2 ;}'
 # Skipped because Go flag.Parse Cant recieve 'int main(){-' although it works.
 # assert -3 'int main(){-3'
+
+# relational/equality
 assert 1 'int main(){return 1==1;}'
 assert 0 'int main(){return 2==1;}'
 assert 0 'int main(){return 10==1;}'
@@ -101,6 +103,7 @@ assert 121 'int main(){return 121;144;169;}'
 assert 3 'int main(){1+1;return 6/2;6-2;}'
 assert 4 'int main(){1+1;6/2;return 6-2;}'
 assert 4 'int main(){ return 6-2;}'
+# identifier
 assert 100 'int main(){int a=100;return a;}'
 assert 10 'int main(){int a=2;int b=8;return a+b;}'
 assert 4 'int main(){int a=2;int b=4;return b;}'
@@ -110,16 +113,19 @@ assert 2 'int main(){int hoge=2;return hoge;}'
 assert 5 'int main(){int hoge_1=2;int fuga=3;return hoge_1+fuga;}'
 assert 4 'int main(){ int al = 2; int be = 3; int ga=1;return al*be-al*ga;}'
 assert 6 'int main(){int al=2;int be=3;int ga=1;int de=5;return (de-al)*ga+be;}'
+# if
 assert 10 'int main(){if (1) return 10;return 20;}'
 assert 20 'int main(){if (0) return 10;return 20;}'
 assert 20 'int main(){if (1==0) return 10;return 20;}'
 assert 10 'int main(){int hoge=1;if (hoge) return 10;return 20;}'
 assert 30 'int main(){int hoge=2;if (hoge==0) return 10; if(hoge==1) return 20; else return 30;}'
 assert 20 'int main(){int hoge=2;if (hoge<1)return 10 ; else return 20;}'
+# for
 assert 55 'int main(){int i=0; int j=0; for (i=0; i=<10; i=i+1) j=i+j; return j;}'
 assert 3 'int main(){for (;;) return 3; return 5;}'
 assert 10 'int main(){int i=0; for(i=0; ; i=i+1) if(i==10) return i;}'
 assert 55 'int main(){int i=0; int j=0; for (i=0; i=<10; ) {j=i+j;  i=i+1;} return j;}'
+#function
 assert 10 'int main(){return ret10();}'
 assert 100 'int main(){return ret100();}'
 assert 8 'int main(){return add(3, 5);}'
@@ -133,7 +139,7 @@ assert 7 'int main() { return myadd4(1,6); } int myadd4(int x,int y) { return x+
 assert 17 'int main() { return myadd5(11,6); } int myadd5(int x,int y) { return x+y; }'
 assert 89 'int main(){return fib(11);} int fib(int n){if(n==1)return 1;if(n==2) return 1; return fib(n-1)+fib(n-2);}'
 
-
+# poiter
 assert 3 'int main() { int x=3; return *&x;  }'
 assert 3 'int main() { int x=3; int *y=&x; int **z=&y; return **z;  }'
 assert 5 'int main() { int x=3; int y=5; return *(&x+1);  }'
@@ -145,7 +151,7 @@ assert 5 'int main() { int x=3; int *y=&x; *y=5; return x;  }'
 assert 7 'int main() { int x=3; int y=5; *(&x+1)=7; return y;  }'
 assert 7 'int main() { int x=3; int y=5; *(&y-1)=7; return x;  }'
 assert 8 'int main() { int x=3; int y=5; return foo(&x, y);  } int foo(int *x, int y) { return *x + y;  }'
-
+# array
 assert 2 'int main() { int x[1]; *x=2; return *x;  }'
 assert 3 'int main() { int x[2]; int *y=&x; *y=3; return *x;  }'
 assert 3 'int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *x;  }'
@@ -174,6 +180,18 @@ assert 5 'int main() { int x[2][3]; int *y=x; y[5]=5; return x[1][2];  }'
 assert 6 'int main() { int x[2][3]; int *y=x; y[6]=6; return x[2][0];  }'
 assert 2 'int main() { int x[3]; x[0]=2; x[1]=4; x[2]=5; return *x;  }'
 assert 5 'int main() { int x[5]; int i=0; int j=0;for(i=0; i<5; i=i+1){x[i]=0;} x[4]=5;j=x[4]; return j; }'
+
+# sizeof
+assert 8 'int main() { int x; return sizeof(x);  }'
+assert 8 'int main() { int x; return sizeof x;  }'
+assert 8 'int main() { int *x; return sizeof(x);  }'
+assert 32 'int main() { int x[4]; return sizeof(x);  }'
+assert 96 'int main() { int x[3][4]; return sizeof(x);  }'
+assert 32 'int main() { int x[3][4]; return sizeof(*x);  }'
+assert 8 'int main() { int x[3][4]; return sizeof(**x);  }'
+assert 9 'int main() { int x[3][4]; return sizeof(**x) + 1;  }'
+assert 9 'int main() { int x[3][4]; return sizeof **x + 1;  }'
+assert 8 'int main() { int x[3][4]; return sizeof(**x + 1);  }'
 
 rm -f tmp.s
 

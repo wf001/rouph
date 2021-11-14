@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var reserve_sig = []string{"return", "if", "else", "for", "int"}
+var reserve_sig = []string{"return", "if", "else", "for", "int", "sizeof"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
 var op = "+-*/()><;={},&[]"
 

@@ -97,6 +97,11 @@ func visit(node *Node) {
 		}
 		node.Ty = node.Lhs.Ty.Base
 		return
+	case ND_KIND_SIZEOF:
+		node.Kind = ND_KIND_NUM
+		node.Ty = intType()
+		node.Val = sizeOf(node.Lhs.Ty)
+		node.Lhs = nil
 	}
 }
 func addType(prg *Function) {
