@@ -28,6 +28,7 @@ const (
 	ND_KIND_RETURN                        // return
 	ND_KIND_IF                            // if
 	ND_KIND_FOR                           // for
+	ND_KIND_SIZEOF                        // size_of
 	ND_KIND_BLOCK                         // {...}
 	ND_KIND_FUNCALL                       // function call
 	ND_KIND_EXPR_STMT                     // Expression Statement
@@ -420,6 +421,12 @@ func primary(tok *Token) (*Token, *Node) {
 		}
 		tok = tok.Next
 		return tok, node
+	}
+
+	if tok.Str == "sizeof" {
+        tok = tok.Next
+		tok, node := unary(tok)
+		return tok, newNode(ND_KIND_SIZEOF, node, nil)
 	}
 
 	if tok.Kind == TK_IDENT {
