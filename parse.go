@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strconv"
+)
+
 var Locals *VarList
 
 /*
@@ -134,8 +138,11 @@ func declaration(tok *Token) (*Token, *Node) {
 	if tok.Kind != TK_IDENT {
 		panic("identifier not found.")
 	}
-	v := pushVar(tok.Str, ty)
+	name := tok.Str
 	tok = tok.Next
+
+	tok, ty = readTypeSuffix(tok, ty)
+	v := pushVar(name, ty)
 
 	if tok.Val == ";" {
 		tok = tok.Next
@@ -261,7 +268,6 @@ func stmt(tok *Token) (*Token, *Node) {
 	tok = tok.Next
 	return tok, node
 }
-
 
 func expr(tok *Token) (*Token, *Node) {
 	printTokenAndeNode("expr", tok)
@@ -593,9 +599,9 @@ func readFuncParam(tok *Token) (*Token, *VarList) {
 	if tok.Kind != TK_IDENT {
 		panic("not found identifier.")
 	}
-    name := tok.Str
-    tok = tok.Next
-    tok, ty = readTypeSuffix(tok, ty)
+	name := tok.Str
+	tok = tok.Next
+	tok, ty = readTypeSuffix(tok, ty)
 
 	vl := new(VarList)
 	vl.V = pushVar(name, ty)
@@ -626,19 +632,20 @@ func readFuncParams(tok *Token) (*Token, *VarList) {
 	return tok, head
 
 }
-func readTypeSuffix(tok *Token, base *Type) (*Token, *Type){
-    if tok.Val != "[" {
-        return tok, base
-    }
-    tok = tok.Next
-    if tok.Kind != TK_KIND_NUM {
-        panic("not number")
-    }
-    sz := tok.Val
-    tok = tok.Next
-    if tok.Val != "]" {
-        panic("not number")
-    }
-    tok, base = readTypeSuffix(tok, base)
-    return arrayOf(base,sz)
+func readTypeSuffix(tok *Token, base *Type) (*Token, *Type) {
+	if tok.Val != "[" {
+		return tok, base
+	}
+	tok = tok.Next
+	if tok.Kind != TK_KIND_NUM {
+		panic("not number")
+	}
+	sz, _ := strconv.Atoi(tok.Val)
+	tok = tok.Next
+	if tok.Val != "]" {
+		panic("not found ]")
+	}
+	tok = tok.Next
+	tok, base = readTypeSuffix(tok, base)
+	return tok, arrayOf(base, sz)
 }
