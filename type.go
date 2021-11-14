@@ -104,8 +104,8 @@ func visit(node *Node) {
 		node.Lhs = nil
 	}
 }
-func addType(prg *Function) {
-	for fn := prg; fn != nil; fn = fn.Next {
+func addType(prg *Prog) {
+	for fn := prg.Fns; fn != nil; fn = fn.Next {
 		for n := fn.N; n != nil; n = n.Next {
 			visit(n)
 		}
