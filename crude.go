@@ -10,7 +10,7 @@ func main() {
 	addType(prg)
 	Info("%+v\n", prg)
 
-	for fn := prg; fn != nil; fn = fn.Next {
+	for fn := prg.Fns; fn != nil; fn = fn.Next {
 		offset := 0
 
 		for vl := fn.Locals; vl != nil; vl = vl.Next {
@@ -22,7 +22,7 @@ func main() {
 	}
 
 	Info("%s\n", "======== print node =========")
-	for fn := prg; fn != nil; fn = fn.Next {
+	for fn := prg.Fns; fn != nil; fn = fn.Next {
 		n := fn.N
 		for ; n != nil; n = n.Next {
 			printNode(n)

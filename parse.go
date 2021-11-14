@@ -5,6 +5,7 @@ import (
 )
 
 var Locals *VarList
+var Globals *VarList
 
 /*
 * Node
@@ -56,9 +57,10 @@ type Node struct {
 }
 
 type Var struct {
-	Name   string
-	Ty     *Type
-	Offset int
+	Name    string
+	Ty      *Type
+	isLocal bool
+	Offset  int
 }
 type VarList struct {
 	Next *VarList
@@ -73,21 +75,35 @@ type Function struct {
 	Locals    *VarList
 	StackSize int
 }
+type Prog struct {
+	Globals *VarList
+	Fns     *Function
+}
 
-func Program(tok *Token) *Function {
+func Program(tok *Token) *Prog {
 	printTokenAndeNode("program", tok)
 	head := new(Function)
 	head.Next = nil
 	cur := head
+	Globals = nil
 
 	for {
 		if tok.Kind == TK_KIND_EOF {
 			break
 		}
-		tok, cur.Next = function(tok)
-		cur = cur.Next
+		if token, isFunc := isFunction(tok); isFunc {
+			tok = token
+			tok, cur.Next = function(tok)
+			cur = cur.Next
+		} else {
+			tok = globalVar(tok)
+		}
+		Info("%s\n", "prg")
 	}
-	return head.Next
+	prg := new(Prog)
+	prg.Globals = Globals
+	prg.Fns = head.Next
+	return prg
 }
 
 func function(tok *Token) (*Token, *Function) {
@@ -248,7 +264,7 @@ func declaration(tok *Token) (*Token, *Node) {
 	tok = tok.Next
 
 	tok, ty = readTypeSuffix(tok, ty)
-	v := pushVar(name, ty)
+	v := pushVar(name, ty, true)
 
 	if tok.Val == ";" {
 		tok = tok.Next
@@ -424,7 +440,7 @@ func primary(tok *Token) (*Token, *Node) {
 	}
 
 	if tok.Str == "sizeof" {
-        tok = tok.Next
+		tok = tok.Next
 		tok, node := unary(tok)
 		return tok, newNode(ND_KIND_SIZEOF, node, nil)
 	}
@@ -466,15 +482,23 @@ func newVar(v *Var) *Node {
 	node.Var = v
 	return node
 }
-func pushVar(name string, ty *Type) *Var {
+func pushVar(name string, ty *Type, isLocal bool) *Var {
 	v := new(Var)
 	v.Name = name
 	v.Ty = ty
+	v.isLocal = isLocal
 
 	vl := new(VarList)
 	vl.V = v
-	vl.Next = Locals
-	Locals = vl
+
+	if isLocal {
+		vl.Next = Locals
+		Locals = vl
+	} else {
+		vl.Next = Globals
+		Globals = vl
+	}
+
 	return v
 }
 func newNodeNum(val int) *Node {
@@ -568,6 +592,11 @@ func findVar(tok *Token) *Var {
 			return vl.V
 		}
 	}
+	for vl := Globals; vl != nil; vl = vl.Next {
+		if vl.V.Name == tok.Str {
+			return vl.V
+		}
+	}
 	return nil
 }
 func readExprStmt(tok *Token) (*Token, *Node) {
@@ -632,7 +661,7 @@ func readFuncParam(tok *Token) (*Token, *VarList) {
 	tok, ty = readTypeSuffix(tok, ty)
 
 	vl := new(VarList)
-	vl.V = pushVar(name, ty)
+	vl.V = pushVar(name, ty, true)
 	return tok, vl
 }
 
@@ -676,4 +705,34 @@ func readTypeSuffix(tok *Token, base *Type) (*Token, *Type) {
 	tok = tok.Next
 	tok, base = readTypeSuffix(tok, base)
 	return tok, arrayOf(base, sz)
+}
+func isFunction(tok *Token) (*Token, bool) {
+	token := tok
+	tok, _ = baseType(tok)
+	isFunc := false
+	if tok.Kind == TK_IDENT {
+		tok = tok.Next
+		if tok.Val == "(" {
+			tok = tok.Next
+			isFunc = true
+		}
+	}
+	tok = token
+	return tok, isFunc
+
+}
+func globalVar(tok *Token) *Token {
+	tok, ty := baseType(tok)
+	if tok.Kind != TK_IDENT {
+		panic("not identifier")
+	}
+	name := tok.Str
+	tok = tok.Next
+	tok, ty = readTypeSuffix(tok, ty)
+	if tok.Val != ";" {
+		panic("not found ;")
+	}
+	tok = tok.Next
+	pushVar(name, ty, false)
+	return tok
 }

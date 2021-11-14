@@ -28,8 +28,13 @@ type Type struct {
 func genAddr(node *Node) {
 	switch node.Kind {
 	case ND_KIND_VAR:
-		fmt.Printf("  lea rax, [rbp-%d]\n", node.Var.Offset)
-		fmt.Println("  push rax")
+		v := node.Var
+		if v.isLocal {
+			fmt.Printf("  lea rax, [rbp-%d]\n", v.Offset)
+			fmt.Println("  push rax")
+		} else {
+			fmt.Printf("  push offset %s\n", v.Name)
+		}
 		return
 	case ND_KIND_DEREF:
 		gen(node.Lhs)
@@ -227,11 +232,19 @@ func gen(node *Node) {
 	}
 	fmt.Println("  push rax")
 }
-func codegen(prg *Function) {
-	Info("%s\n", "---------------------- instruction ---------------")
-	Info("%s\n", "")
-	fmt.Println(".intel_syntax noprefix")
-	for fn := prg; fn != nil; fn = fn.Next {
+func emitData(prg *Prog) {
+	fmt.Printf(".data\n")
+	for vl := prg.Globals; vl != nil; vl = vl.Next {
+		v := vl.V
+		fmt.Printf("%s:\n", v.Name)
+		fmt.Printf("  .zero %d\n", sizeOf(v.Ty))
+	}
+}
+
+func emitText(prg *Prog) {
+	fmt.Printf(".text\n")
+
+	for fn := prg.Fns; fn != nil; fn = fn.Next {
 		fmt.Printf(".global %s\n", fn.Name)
 		fmt.Printf("%s:\n", fn.Name)
 		funcName = fn.Name
@@ -257,4 +270,11 @@ func codegen(prg *Function) {
 
 	}
 
+}
+func codegen(prg *Prog) {
+	Info("%s\n", "---------------------- instruction ---------------")
+	Info("%s\n", "")
+	fmt.Println(".intel_syntax noprefix")
+	emitData(prg)
+	emitText(prg)
 }
