@@ -132,38 +132,6 @@ func function(tok *Token) (*Token, *Function) {
 	return tok, fn
 }
 
-func declaration(tok *Token) (*Token, *Node) {
-	printTokenAndeNode("declaration", tok)
-	tok, ty := baseType(tok)
-	if tok.Kind != TK_IDENT {
-		panic("identifier not found.")
-	}
-	name := tok.Str
-	tok = tok.Next
-
-	tok, ty = readTypeSuffix(tok, ty)
-	v := pushVar(name, ty)
-
-	if tok.Val == ";" {
-		tok = tok.Next
-		return tok, newNode(ND_KIND_NULL, nil, nil)
-	}
-
-	if tok.Val != "=" {
-		panic("= not found.")
-	}
-	tok = tok.Next
-	Lhs := newVar(v)
-	tok, Rhs := expr(tok)
-	if tok.Val != ";" {
-		panic("; not found.")
-	}
-	tok = tok.Next
-	node := newNode(ND_KIND_ASSIGN, Lhs, Rhs)
-
-	return tok, newNode(ND_KIND_EXPR_STMT, node, nil)
-
-}
 func stmt(tok *Token) (*Token, *Node) {
 	printTokenAndeNode("stmt", tok)
 	if tok.Val == "return" {
@@ -267,6 +235,39 @@ func stmt(tok *Token) (*Token, *Node) {
 	}
 	tok = tok.Next
 	return tok, node
+}
+
+func declaration(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("declaration", tok)
+	tok, ty := baseType(tok)
+	if tok.Kind != TK_IDENT {
+		panic("identifier not found.")
+	}
+	name := tok.Str
+	tok = tok.Next
+
+	tok, ty = readTypeSuffix(tok, ty)
+	v := pushVar(name, ty)
+
+	if tok.Val == ";" {
+		tok = tok.Next
+		return tok, newNode(ND_KIND_NULL, nil, nil)
+	}
+
+	if tok.Val != "=" {
+		panic("= not found.")
+	}
+	tok = tok.Next
+	Lhs := newVar(v)
+	tok, Rhs := expr(tok)
+	if tok.Val != ";" {
+		panic("; not found.")
+	}
+	tok = tok.Next
+	node := newNode(ND_KIND_ASSIGN, Lhs, Rhs)
+
+	return tok, newNode(ND_KIND_EXPR_STMT, node, nil)
+
 }
 
 func expr(tok *Token) (*Token, *Node) {
@@ -389,7 +390,25 @@ func unary(tok *Token) (*Token, *Node) {
 		tok, u_node = unary(tok)
 		return tok, newNode(ND_KIND_DEREF, u_node, nil)
 	}
-	return primary(tok)
+	return postFix(tok)
+}
+func postFix(tok *Token) (*Token, *Node) {
+	tok, node := primary(tok)
+	var p_node *Node
+	for {
+		if tok.Val != "[" {
+			break
+		}
+		tok = tok.Next
+		tok, p_node = expr(tok)
+		exp := newNode(ND_KIND_ADD, p_node, node)
+		if tok.Val != "]" {
+			panic("not found ]")
+		}
+		tok = tok.Next
+		node = newNode(ND_KIND_DEREF, exp, nil)
+	}
+	return tok, node
 }
 func primary(tok *Token) (*Token, *Node) {
 	printTokenAndeNode("primary", tok)
