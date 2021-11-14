@@ -463,6 +463,8 @@ func printNode(node *Node) {
 		Info("##\x1b[32m node %p\x1b[0m\n", node)
 		switch node.Kind {
 
+		case ND_KIND_NULL:
+			return
 		case ND_KIND_NUM:
 			Info("## %+v\n", node)
 			Info("## type -> %+v\n", node.Ty)

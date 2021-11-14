@@ -14,9 +14,9 @@ func main() {
 		offset := 0
 
 		for vl := fn.Locals; vl != nil; vl = vl.Next {
-            v := vl.V
-            offset += sizeOf(v.Ty)
-            v.Offset = offset
+			v := vl.V
+			offset += sizeOf(v.Ty)
+			v.Offset = offset
 		}
 		fn.StackSize = offset
 	}

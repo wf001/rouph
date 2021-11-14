@@ -183,7 +183,7 @@ func gen(node *Node) {
 		break
 	case ND_KIND_SUB:
 		if node.Ty.Kind == TY_PTR {
-			fmt.Printf("  imul rdi, 8\n")
+			fmt.Printf("  imul rdi, %d\n", sizeOf(node.Ty.Base))
 		}
 		fmt.Printf("  sub rax, rdi\n")
 		break
