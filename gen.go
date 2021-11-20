@@ -233,7 +233,13 @@ func emitData(prg *Prog) {
 	for vl := prg.Globals; vl != nil; vl = vl.Next {
 		v := vl.V
 		fmt.Printf("%s:\n", v.Name)
-		fmt.Printf("  .zero %d\n", sizeOf(v.Ty))
+		if v.Contents != nil {
+			fmt.Printf("  .zero %d\n", sizeOf(v.Ty))
+			continue
+		}
+		for i := 0; i < v.contLen; i++ {
+			fmt.Printf("  .byte %d\n", v.Contents[i])
+		}
 	}
 }
 

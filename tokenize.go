@@ -19,6 +19,7 @@ type TokKind int
 const (
 	TK_KIND_RESERVED TokKind = iota + 1
 	TK_IDENT
+	TK_STR
 	TK_KIND_NUM
 	TK_KIND_EOF
 )

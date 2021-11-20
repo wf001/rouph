@@ -6,6 +6,7 @@ import (
 
 var Locals *VarList
 var Globals *VarList
+var cnt int = -1
 
 /*
 * Node
@@ -745,4 +746,8 @@ func globalVar(tok *Token) *Token {
 }
 func isTypeName(tok *Token) bool {
 	return tok.Str == "char" || tok.Str == "int"
+}
+func newLabel(s string) string {
+	cnt += 1
+	return ".L.data." + strconv.Itoa(cnt)
 }
