@@ -25,10 +25,12 @@ const (
 )
 
 type Token struct {
-	Kind TokKind
-	Next *Token
-	Val  string
-	Str  string
+	Kind     TokKind
+	Next     *Token
+	Val      string
+	Str      string
+	Contents string
+	ContLen  int
 }
 
 func printToken(tok *Token) {
@@ -88,6 +90,10 @@ func TokenizeHandler() *Token {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
 		} else if isAlpha(rune(s[0])) {
 			cur = newToken(TK_IDENT, cur, s)
+		} else if string(s[0]) == "\"" {
+			cur = newToken(TK_STR, cur, s)
+			cur.ContLen = len(string(s))-1
+			cur.Contents = string(s)[1:cur.ContLen] + string(rune(0))
 		} else {
 			cur = newToken(TK_KIND_NUM, cur, s)
 		}
@@ -102,10 +108,26 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 		arr = appendIfExists(arr, number, valName)
 		return arr
 	}
+	Info("input %s\n", string(input[i]))
 	// if input[i] is space, it skipped
 	if string(input[i]) == " " {
 		arr = appendIfExists(arr, number, valName)
 		number, valName = "", ""
+		i += 1
+		// if input[i] is '"'
+	} else if string(input[i]) == "\"" {
+		arr = appendIfExists(arr, number, valName)
+		number, valName = "", ""
+		strVal := string(input[i])
+		for {
+			i += 1
+			if string(input[i]) == "\"" {
+				break
+			}
+			strVal += string(input[i])
+		}
+		strVal += string(input[i])
+		arr = append(arr, strVal)
 		i += 1
 		// if input[i] is reserved signature
 	} else if sig, res := startWith(string(input[i:]), reserve_sig); res &&
