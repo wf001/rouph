@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var reserve_sig = []string{"return", "if", "else", "for", "int", "sizeof"}
+var reserve_sig = []string{"return", "if", "else", "for", "int", "sizeof", "char"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
 var op = "+-*/()><;={},&[]"
 
@@ -108,6 +108,7 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 		i += 1
 		// if input[i] is reserved signature
 	} else if sig, res := startWith(string(input[i:]), reserve_sig); res &&
+		len(valName) == 0 &&
 		!isAlphaNum(rune(input[i+len(sig)])) {
 		arr = appendIfExists(arr, number, valName)
 		arr, number, valName = append(arr, sig), "", ""
