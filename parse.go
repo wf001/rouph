@@ -58,10 +58,12 @@ type Node struct {
 }
 
 type Var struct {
-	Name    string
-	Ty      *Type
-	isLocal bool
-	Offset  int
+	Name     string
+	Ty       *Type
+	isLocal  bool
+	Offset   int
+	Contents string
+	ContLen  int
 }
 type VarList struct {
 	Next *VarList
@@ -465,11 +467,21 @@ func primary(tok *Token) (*Token, *Node) {
 			panic("undefined variable.")
 		}
 		return tok, newVar(v)
-	} else {
-		i := isNumber(tok.Val)
-		tok = tok.Next
-		return tok, newNodeNum(i)
 	}
+    // type 'string'
+	if tok.Kind == TK_STR {
+		ty := arrayOf(charType(), tok.ContLen)
+		v := pushVar(newLabel(), ty, false)
+		v.Contents = tok.Contents
+        Info("%d\n", v.ContLen)
+        Info("%d\n", tok.ContLen)
+		v.ContLen = tok.ContLen
+		tok = tok.Next
+		return tok, newVar(v)
+	}
+	i := isNumber(tok.Val)
+	tok = tok.Next
+	return tok, newNodeNum(i)
 }
 func newNode(kind NodeKind, lhs *Node, rhs *Node) *Node {
 	node := new(Node)
@@ -747,7 +759,7 @@ func globalVar(tok *Token) *Token {
 func isTypeName(tok *Token) bool {
 	return tok.Str == "char" || tok.Str == "int"
 }
-func newLabel(s string) string {
+func newLabel() string {
 	cnt += 1
 	return ".L.data." + strconv.Itoa(cnt)
 }
