@@ -241,7 +241,7 @@ func stmt(tok *Token) (*Token, *Node) {
 		return tok, node
 	}
 
-	if tok.Str == "int" {
+	if isTypeName(tok) {
 		return declaration(tok)
 	}
 
@@ -636,11 +636,18 @@ func printTokenAndeNode(name string, tok *Token) {
 }
 
 func baseType(tok *Token) (*Token, *Type) {
-	if tok.Str != "int" {
-		panic("not found int.")
+	var ty *Type
+
+	if tok.Str == "char" {
+		tok = tok.Next
+		ty = charType()
+	} else {
+		if tok.Str != "int" {
+			panic("tok.Str must be char or int")
+		}
+		tok = tok.Next
+		ty = intType()
 	}
-	tok = tok.Next
-	ty := intType()
 	for {
 		if tok.Val != "*" {
 			break
@@ -735,4 +742,7 @@ func globalVar(tok *Token) *Token {
 	tok = tok.Next
 	pushVar(name, ty, false)
 	return tok
+}
+func isTypeName(tok *Token) bool {
+	return tok.Str == "char" || tok.Str == "int"
 }

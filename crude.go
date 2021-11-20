@@ -1,5 +1,9 @@
 package main
 
+func alignTo(n int, align int) int {
+	return (n + align - 1) & (^(align - 1))
+}
+
 func main() {
 	// tokenize
 	head := TokenizeHandler()
@@ -18,7 +22,7 @@ func main() {
 			offset += sizeOf(v.Ty)
 			v.Offset = offset
 		}
-		fn.StackSize = offset
+		fn.StackSize = alignTo(offset, 8)
 	}
 
 	Info("%s\n", "======== print node =========")

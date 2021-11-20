@@ -4,26 +4,14 @@ import (
 	"fmt"
 )
 
-var argReg = []string{"rdi", "rsi", "rdx", "rcx", "r8", "r9"}
+var argReg1 = []string{"dil", "sil", "dl", "cl", "r8b", "r9b"}
+var argReg8 = []string{"rdi", "rsi", "rdx", "rcx", "r8", "r9"}
 var labelSeq = 0
 var funcName string
 
 /*
 * Type
  */
-type TypeKind int
-
-const (
-	TY_INT TypeKind = iota + 1 // +
-	TY_PTR
-	TY_ARRAY
-)
-
-type Type struct {
-	Kind      TypeKind
-	Base      *Type
-	ArraySize int
-}
 
 func genAddr(node *Node) {
 	switch node.Kind {
@@ -48,15 +36,23 @@ func genLval(node *Node) {
 	}
 	genAddr(node)
 }
-func load() {
+func load(ty *Type) {
 	fmt.Println("  pop rax")
-	fmt.Println("  mov rax, [rax]")
+	if sizeOf(ty) == 1 {
+		fmt.Println("  movsx rax, byte ptr [rax]")
+	} else {
+		fmt.Println("  mov rax, [rax]")
+	}
 	fmt.Println("  push rax")
 }
-func store() {
+func store(ty *Type) {
 	fmt.Println("  pop rdi")
 	fmt.Println("  pop rax")
-	fmt.Println("  mov [rax], rdi")
+	if sizeOf(ty) == 1 {
+		fmt.Println("  mov [rax], dil")
+	} else {
+		fmt.Println("  mov [rax], rdi")
+	}
 	fmt.Println("  push rdi")
 }
 
@@ -74,7 +70,7 @@ func gen(node *Node) {
 	case ND_KIND_VAR:
 		genAddr(node)
 		if node.Ty.Kind != TY_ARRAY {
-			load()
+			load(node.Ty)
 		}
 		return
 	case ND_KIND_ASSIGN:
@@ -82,7 +78,7 @@ func gen(node *Node) {
 		genLval(node.Lhs)
 		// push right side val
 		gen(node.Rhs)
-		store()
+		store(node.Ty)
 		return
 	case ND_KIND_ADDR:
 		genAddr(node.Lhs)
@@ -90,7 +86,7 @@ func gen(node *Node) {
 	case ND_KIND_DEREF:
 		gen(node.Lhs)
 		if node.Ty.Kind != TY_ARRAY {
-			load()
+			load(node.Ty)
 		}
 		return
 	case ND_KIND_IF:
@@ -147,7 +143,7 @@ func gen(node *Node) {
 			nargs += 1
 		}
 		for i := nargs - 1; i >= 0; i -= 1 {
-			fmt.Printf("  pop %s\n", argReg[i])
+			fmt.Printf("  pop %s\n", argReg8[i])
 		}
 
 		seq := labelSeq
@@ -241,6 +237,17 @@ func emitData(prg *Prog) {
 	}
 }
 
+func loadArg(v *Var, idx int) {
+	sz := sizeOf(v.Ty)
+	if sz == 1 {
+		fmt.Printf("  mov [rbp-%d], %s\n", v.Offset, argReg1[idx])
+	} else if sz == 8 {
+		fmt.Printf("  mov [rbp-%d], %s\n", v.Offset, argReg8[idx])
+	} else {
+		panic("type size must be 1 or 8.")
+	}
+}
+
 func emitText(prg *Prog) {
 	fmt.Printf(".text\n")
 
@@ -255,8 +262,7 @@ func emitText(prg *Prog) {
 
 		i := 0
 		for vl := fn.Params; vl != nil; vl = vl.Next {
-			v := vl.V
-			fmt.Printf("  mov [rbp-%d], %s\n", v.Offset, argReg[i])
+			loadArg(vl.V, i)
 			i += 1
 		}
 

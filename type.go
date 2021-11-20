@@ -1,31 +1,55 @@
 package main
 
+type TypeKind int
+
+const (
+	TY_CHAR TypeKind = iota + 1 // +
+	TY_INT
+	TY_PTR
+	TY_ARRAY
+)
+
+type Type struct {
+	Kind      TypeKind
+	Base      *Type
+	ArraySize int
+}
+
+func newType(kind TypeKind) *Type {
+	ty := new(Type)
+	ty.Kind = kind
+	return ty
+}
+
 func intType() *Type {
-	t := new(Type)
-	t.Kind = TY_INT
-	return t
+	return newType(TY_INT)
+}
+func charType() *Type {
+	return newType(TY_CHAR)
 }
 func pointerTo(base *Type) *Type {
-	t := new(Type)
-	t.Kind = TY_PTR
+	t := newType(TY_PTR)
 	t.Base = base
 	return t
 }
 func arrayOf(base *Type, size int) *Type {
-	ty := new(Type)
-	ty.Kind = TY_ARRAY
+	ty := newType(TY_ARRAY)
 	ty.Base = base
 	ty.ArraySize = size
 	return ty
 }
 func sizeOf(ty *Type) int {
-	if ty.Kind == TY_INT || ty.Kind == TY_PTR {
+	switch ty.Kind {
+	case TY_INT, TY_PTR:
 		return 8
+	case TY_CHAR:
+		return 1
+	default:
+		if ty.Kind != TY_ARRAY {
+			panic("type is allowed only array.")
+		}
+		return sizeOf(ty.Base) * ty.ArraySize
 	}
-	if ty.Kind != TY_ARRAY {
-		panic("type is allowed only array.")
-	}
-	return sizeOf(ty.Base) * ty.ArraySize
 }
 
 func visit(node *Node) {
