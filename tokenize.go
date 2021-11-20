@@ -92,7 +92,7 @@ func TokenizeHandler() *Token {
 			cur = newToken(TK_IDENT, cur, s)
 		} else if string(s[0]) == "\"" {
 			cur = newToken(TK_STR, cur, s)
-			cur.ContLen = len(string(s))-1
+			cur.ContLen = len(string(s)) - 1
 			cur.Contents = string(s)[1:cur.ContLen] + string(rune(0))
 		} else {
 			cur = newToken(TK_KIND_NUM, cur, s)
@@ -124,7 +124,12 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 			if string(input[i]) == "\"" {
 				break
 			}
-			strVal += string(input[i])
+			if string(input[i]) == "\\" {
+				i += 1
+				strVal += string(getEscapeChar(string(input[i])))
+			} else {
+				strVal += string(input[i])
+			}
 		}
 		strVal += string(input[i])
 		arr = append(arr, strVal)
@@ -204,4 +209,29 @@ func isAlpha(c rune) bool {
 func isAlphaNum(c rune) bool {
 	res := isAlpha(c) || (rune('0') <= c && c <= rune('9'))
 	return res
+}
+func getEscapeChar(c string) rune {
+	switch c {
+	case "a":
+		return '\a'
+	case "b":
+		return '\b'
+	case "t":
+		return '\t'
+	case "n":
+		return '\n'
+	case "v":
+		return '\v'
+	case "f":
+		return '\f'
+	case "r":
+		return '\r'
+	case "e":
+		return 27
+	case "0":
+		return 0
+	default:
+		return rune(c[0])
+	}
+
 }
