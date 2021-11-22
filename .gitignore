@@ -6,3 +6,5 @@ tmp
 *.asm
 .gdb_history
 peda-session*
+a.out
+test

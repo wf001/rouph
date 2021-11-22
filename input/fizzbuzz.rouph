@@ -1,0 +1,17 @@
+def main(){
+    fizzbuzz(20)
+}
+def fizzbuzz(n:int):void{
+
+    for i:int=0;i<20;i++{
+        if i % 15 {
+            printf("%s\n", "fizzbuzz)
+        }
+        else if i % 5 {
+            printf("%s\n", "fizz)
+        }
+        else if i % 3 {
+            printf("%s\n", "buzz)
+        }
+    }
+}
