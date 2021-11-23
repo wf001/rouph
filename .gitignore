@@ -1,10 +1,11 @@
 crude
 crude-lang-go
-*.o
 tmp
-*.s
-*.asm
-.gdb_history
-peda-session*
 a.out
 test
+
+*.o
+*.asm
+
+.gdb_history
+peda-session*
