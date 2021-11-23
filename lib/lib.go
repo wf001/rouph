@@ -7,8 +7,16 @@ import (
 func LibPrint() {
 	fmt.Println("")
 }
+func StdlibHandler(libName string, target string, length int) {
+	if libName == "puts" {
+		libPuts(target, length)
+	} else {
+		panic("not found std lib")
+	}
+}
 
-func RouphLibPuts(name string, length int) {
+func libPuts(name string, length int) {
+	fmt.Printf(".puts:\n")
 	fmt.Printf("  push offset %s\n", name)
 	fmt.Printf("  mov rsi, [rsp]\n")
 	fmt.Printf("  mov rdx, %d\n", length)

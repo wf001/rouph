@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+var standard_lib = []string{"puts"}
 var reserve_sig = []string{"return", "if", "else", "for", "int", "sizeof", "char"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
 var op = "+-*/()><;={},&[]"
@@ -22,6 +23,7 @@ const (
 	TK_STR
 	TK_KIND_NUM
 	TK_KIND_EOF
+	TK_STDLIB
 )
 
 type Token struct {
@@ -84,12 +86,19 @@ func TokenizeHandler() *Token {
 	//tokenize
 	Info("arg_arr:%#v\n", arg_arr)
 	for _, s := range arg_arr {
+		// reserved signature
 		if _, res := isReserved(s); res {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
+			// return statement
 		} else if s == "return" {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
+		} else if _, res := startWith(s, standard_lib); res {
+			cur = newToken(TK_STDLIB, cur, s)
+			// identifier
 		} else if isAlpha(rune(s[0])) {
 			cur = newToken(TK_IDENT, cur, s)
+			// standard library
+			// string literal
 		} else if string(s[0]) == "\"" {
 			cur = newToken(TK_STR, cur, s)
 			cur.ContLen = len(string(s)) - 1
@@ -138,6 +147,12 @@ func Scan(input string, i int, n int, arr []string, number string, valName strin
 	} else if sig, res := startWith(string(input[i:]), reserve_sig); res &&
 		len(valName) == 0 &&
 		!isAlphaNum(rune(input[i+len(sig)])) {
+		arr = appendIfExists(arr, number, valName)
+		arr, number, valName = append(arr, sig), "", ""
+		i += len(sig)
+		// if input[i] is standard library
+	} else if sig, res := startWith(string(input[i:]), standard_lib); res &&
+		len(valName) == 0 {
 		arr = appendIfExists(arr, number, valName)
 		arr, number, valName = append(arr, sig), "", ""
 		i += len(sig)

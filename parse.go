@@ -37,6 +37,7 @@ const (
 	ND_KIND_VAR                           // Local Variables
 	ND_KIND_NUM                           // Integer
 	ND_KIND_NULL                          // null
+	ND_KIND_STDLIB                        // standard library
 )
 
 type Node struct {
@@ -447,6 +448,14 @@ func primary(tok *Token) (*Token, *Node) {
 		tok, node := unary(tok)
 		return tok, newNode(ND_KIND_SIZEOF, node, nil)
 	}
+	if tok.Kind == TK_STDLIB {
+		lib_name := tok.Val
+
+		tok = tok.Next
+		tok, node := unary(tok)
+		node.Func = lib_name
+		return tok, newNode(ND_KIND_STDLIB, node, nil)
+	}
 
 	if tok.Kind == TK_IDENT {
 		i_tok := tok
@@ -468,13 +477,13 @@ func primary(tok *Token) (*Token, *Node) {
 		}
 		return tok, newVar(v)
 	}
-    // type 'string'
+	// type 'string'
 	if tok.Kind == TK_STR {
 		ty := arrayOf(charType(), tok.ContLen)
 		v := pushVar(newLabel(), ty, false)
 		v.Contents = tok.Contents
-        Info("%d\n", v.ContLen)
-        Info("%d\n", tok.ContLen)
+		Info("%d\n", v.ContLen)
+		Info("%d\n", tok.ContLen)
 		v.ContLen = tok.ContLen
 		tok = tok.Next
 		return tok, newVar(v)
@@ -531,6 +540,9 @@ func printNode(node *Node) {
 		case ND_KIND_NUM:
 			Info("## %+v\n", node)
 			Info("## type -> %+v\n", node.Ty)
+			return
+		case ND_KIND_STDLIB:
+			Info("## %+v\n", node)
 			return
 		case ND_KIND_EXPR_STMT:
 			Info("## %+v\n", node)
@@ -613,6 +625,7 @@ func findVar(tok *Token) *Var {
 	return nil
 }
 func readExprStmt(tok *Token) (*Token, *Node) {
+	printTokenAndeNode("readExprStmt", tok)
 	tok, r_node := expr(tok)
 	node := newNode(ND_KIND_EXPR_STMT, r_node, nil)
 	return tok, node
