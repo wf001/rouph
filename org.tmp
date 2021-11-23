@@ -5,7 +5,7 @@
   .byte 101
   .byte 108
   .byte 108
-  .byte 111
+  .byte 110
   .byte 0
 .text
 .global main
@@ -14,27 +14,20 @@ main:
   mov rbp, rsp
   sub rsp, 0
   push offset .L.data.0
-  push 0
-  pop rdi
-  pop rax
-  imul rdi, 1
-  add rax, rdi
-  push rax
-  pop rax
-  movsx rax, byte ptr [rax]
-  push rax
-  pop rax
+  mov r8, 5
+  mov rsi, [rsp]
   call .puts
   jmp .Lreturn.main
 
 .puts:
-  push offset .L.data.0
-  mov rsi, [rsp]
-  mov rdx, 5
+  mov rdx, 1
   mov rax, 1
   mov rdi, 1
   syscall
-  pop rax
+  sub r8, 1
+  add rsi, 1
+  cmp r8, 0
+  jnz .puts
 
   push 0xa
   mov rsi, rsp
@@ -46,4 +39,5 @@ main:
 .Lreturn.main:
   mov rsp, rbp
   pop rbp
+  mov rax, 0
   ret
