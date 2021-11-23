@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crude-lang-go/lib"
 	"fmt"
 )
 
@@ -168,6 +169,11 @@ func gen(node *Node) {
 		gen(node.Lhs)
 		fmt.Printf("  pop rax\n")
 		fmt.Printf("  jmp .Lreturn.%s\n", funcName)
+		return
+	case ND_KIND_STDLIB:
+		Info("lib_name %s\n", node.Lhs.Func)
+		fmt.Printf("  call .%s\n", node.Lhs.Func)
+		lib.StdlibHandler(node.Lhs.Func, node.Lhs.Var.Name, len(node.Lhs.Var.Name)-1)
 		return
 	}
 	gen(node.Lhs)
