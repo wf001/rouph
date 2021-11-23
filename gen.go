@@ -10,10 +10,6 @@ var argReg8 = []string{"rdi", "rsi", "rdx", "rcx", "r8", "r9"}
 var labelSeq = 0
 var funcName string
 
-/*
-* Type
- */
-
 func genAddr(node *Node) {
 	switch node.Kind {
 	case ND_KIND_VAR:
@@ -171,9 +167,10 @@ func gen(node *Node) {
 		fmt.Printf("  jmp .Lreturn.%s\n", funcName)
 		return
 	case ND_KIND_STDLIB:
-		Info("lib_name %s\n", node.Lhs.Func)
+		fmt.Printf("  push offset %s\n", node.Lhs.Var.Name)
+		fmt.Printf("  mov r8, %d\n", node.Lhs.Var.ContLen-1)
+		fmt.Printf("  mov rsi, [rsp]\n")
 		fmt.Printf("  call .%s\n", node.Lhs.Func)
-		lib.StdlibHandler(node.Lhs.Func, node.Lhs.Var.Name, len(node.Lhs.Var.Name)-1)
 		return
 	}
 	gen(node.Lhs)
@@ -295,4 +292,5 @@ func codegen(prg *Prog) {
 	fmt.Println(".intel_syntax noprefix")
 	emitData(prg)
 	emitText(prg)
+	lib.StdlibHandler()
 }
