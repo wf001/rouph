@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crude-lang-go/lib"
+	"rouphc/lib"
 	"fmt"
 )
 
