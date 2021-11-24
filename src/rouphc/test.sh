@@ -14,7 +14,7 @@ assert() {
     expected="$1"
     input="$2"
 
-    ./crude-lang-go -i "$input" > tmp.s
+    ./rouphc -i "$input" > tmp.s
     gcc -static -o tmp tmp.s tmp2.o
     ./tmp
     actual="$?"
@@ -247,6 +247,7 @@ assert 108 'int main() { return "\l"[0];  }'
 
 
 rm -f tmp.s
+rm -f rouphc
 
 echo $msg
 exit $code

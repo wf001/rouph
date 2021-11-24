@@ -1,5 +1,4 @@
-crude
-crude-lang-go
+bin/*
 tmp
 a.out
 test
