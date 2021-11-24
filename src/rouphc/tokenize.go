@@ -12,7 +12,7 @@ import (
 var standard_lib = []string{"puts"}
 var reserve_sig = []string{"return", "if", "else", "for", "int", "sizeof", "char"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
-var op = "+-*/()><;={},&[]"
+var op = "+-*/()><;={},&[]%"
 
 type TokKind int
 

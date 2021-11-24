@@ -198,6 +198,12 @@ func gen(node *Node) {
 		fmt.Printf("  cqo\n")
 		fmt.Printf("  idiv rdi\n")
 		break
+	case ND_KIND_REM:
+		fmt.Printf("  mov rdx, 0\n")
+		fmt.Printf("  mov rbx, rdi\n")
+		fmt.Printf("  div rbx\n")
+		fmt.Printf("  mov rax, rdx\n")
+		break
 	case ND_KIND_EQ:
 		fmt.Printf("  cmp rax, rdi\n")
 		fmt.Printf("  sete al\n")
