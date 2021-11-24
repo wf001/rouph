@@ -18,6 +18,7 @@ const (
 	ND_KIND_SUB                           // -
 	ND_KIND_MUL                           // *
 	ND_KIND_DIV                           // /
+	ND_KIND_REM                           // %
 	ND_KIND_EQ                            // ==
 	ND_KIND_NE                            // !=
 	ND_KIND_LT                            // <
@@ -384,6 +385,10 @@ func mul(tok *Token) (*Token, *Node) {
 			tok = tok.Next
 			tok, p_node = unary(tok)
 			node = newNode(ND_KIND_DIV, node, p_node)
+		} else if tok.Val == "%" {
+			tok = tok.Next
+			tok, p_node = unary(tok)
+			node = newNode(ND_KIND_REM, node, p_node)
 		} else {
 			return tok, node
 		}

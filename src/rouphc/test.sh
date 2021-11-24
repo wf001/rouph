@@ -245,6 +245,16 @@ assert 107 'int main() { return "\k"[0];  }'
 assert 108 'int main() { return "\l"[0];  }'
 
 
+echo -e "\e[1;34m< remainder >\e[0m"
+assert 1 'int main() { return 3%2;  }'
+assert 0 'int main() { return 4%2;  }'
+assert 4 'int main() { return 4%5;  }'
+assert 4 'int main() { int a = 60; int b = 7; int c = a%b; return c;  }'
+assert 1 'int main() { return (7%4) == 3;  }'
+assert 0 'int main() { return (9%4) == 3;  }'
+
+
+
 
 rm -f tmp.s
 rm -f rouphc
