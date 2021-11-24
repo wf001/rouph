@@ -2,9 +2,12 @@ bin/*
 tmp
 a.out
 test
+rouphc
+
 
 *.o
 *.asm
+*.s
 
 .gdb_history
 peda-session*
