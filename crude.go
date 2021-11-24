@@ -1,12 +1,37 @@
 package main
 
+import (
+	"bufio"
+	"flag"
+	"os"
+)
+
 func alignTo(n int, align int) int {
 	return (n + align - 1) & (^(align - 1))
 }
 
 func main() {
+	s := flag.String("i", "", "")
+	flag.Parse()
+	var arg string
+    Info("%s\n", *s)
+
+	if *s != "" {
+		arg = *s
+	} else {
+        file := flag.Arg(0)
+		data, _ := os.Open(file)
+		defer data.Close()
+		scanner := bufio.NewScanner(data)
+		var input_arr = ""
+		for scanner.Scan() {
+			input_arr += scanner.Text()
+		}
+        arg = input_arr
+	}
+	Info("arg:%s\n", arg)
 	// tokenize
-	head := TokenizeHandler()
+	head := TokenizeHandler(arg)
 	printToken(head)
 	// parse
 	prg := Program(head.Next)
