@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"regexp"
@@ -69,12 +68,7 @@ func newToken(kind TokKind, cur *Token, val string) *Token {
 	cur.Next = tok
 	return tok
 }
-func TokenizeHandler() *Token {
-	flag.Parse()
-	arg := flag.Arg(0)
-	// space trim
-	Info("arg:%s\n", arg)
-	// gen num arr
+func TokenizeHandler(arg string) *Token {
 	var arg_arr []string
 	arg_arr = Scan(arg, 0, len(arg), arg_arr, "", "")
 
