@@ -1,3 +1,6 @@
 int main() {
-    puts("fuga");
+    int a = 1;
+    int b = 2;
+    put(a);
+    put(b);
 }

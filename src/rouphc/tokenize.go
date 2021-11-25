@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var standard_lib = []string{"puts"}
+var standard_lib = []string{"put"}
 var reserve_sig = []string{"return", "if", "else", "for", "int", "sizeof", "char"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
 var op = "+-*/()><;={},&[]%"
