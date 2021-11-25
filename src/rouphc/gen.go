@@ -167,15 +167,19 @@ func gen(node *Node) {
 		fmt.Printf("  jmp .Lreturn.%s\n", funcName)
 		return
 	case ND_KIND_STDLIB:
-		if node.Lhs.Var.isLocal {
-			fmt.Printf("  lea rsi, [rbp-%d]\n", node.Lhs.Var.Offset)
-			fmt.Printf("  mov r8, %d\n", 1)
+		Info("stdlib %+v\n", node)
+		Info("stdlib %+v\n", node.Lhs)
+		if node.Lhs.Var != nil && node.Lhs.Var.isLocal {
+			fmt.Printf("  mov rax, [rbp-%d]\n", node.Lhs.Var.Offset)
+			fmt.Printf("  mov rbx, 10\n")
+			fmt.Printf("  mov r8, %d\n", 0)
+			fmt.Printf("  mov r9, %d\n", 0)
 		} else {
 			fmt.Printf("  push offset %s\n", node.Lhs.Var.Name)
 			fmt.Printf("  mov r8, %d\n", node.Lhs.Var.ContLen-1)
 			fmt.Printf("  mov rsi, [rsp]\n")
+			fmt.Printf("  mov r9, %d\n", 1)
 		}
-		Info("stdlib %+v\n", node.Lhs.Var)
 		fmt.Printf("  call .%s\n", node.Lhs.Func)
 		return
 	}
