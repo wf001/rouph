@@ -592,6 +592,9 @@ func printNode(node *Node) {
 			return
 		case ND_KIND_IF:
 			if node.Else != nil {
+				Info("## %+v\n", node)
+				Info("## then -> %+v\n", node.Then)
+				Info("## else -> %+v\n", node.Else)
 				gen(node.Cond)
 				gen(node.Then)
 				gen(node.Else)
