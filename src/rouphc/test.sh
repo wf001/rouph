@@ -127,10 +127,10 @@ assert 20 'int main(){int hoge=2;if (hoge == 1) return 10 ; else if (hoge == 2) 
 assert 30 'int main(){int hoge=3;if (hoge == 1) return 10 ; else if (hoge == 2) return 20; else return 30;}'
 
 echo -e "\e[1;34m< for >\e[0m"
-assert 55 'int main(){int i=0; int j=0; for (i=0; i=<10; i=i+1) j=i+j; return j;}'
-assert 3 'int main(){for (;;) return 3; return 5;}'
-assert 10 'int main(){int i=0; for(i=0; ; i=i+1) if(i==10) return i;}'
-assert 55 'int main(){int i=0; int j=0; for (i=0; i=<10; ) {j=i+j;  i=i+1;} return j;}'
+assert 55 'int main(){int i=0; int j=0; for i=0; i=<10; i=i+1{ j=i+j;} return j;}'
+assert 3 'int main(){for ;; {return 3;} return 5;}'
+assert 10 'int main(){int i=0; for i=0;; i=i+1 { if(i==10) return i;}}'
+assert 55 'int main(){int i=0; int j=0; for i=0; i=<10; {j=i+j;  i=i+1;} return j;}'
 
 echo -e "\e[1;34m< function call >\e[0m"
 assert 10 'int main(){return ret10();}'
@@ -188,7 +188,7 @@ assert 4 'int main() { int x[2][3]; int *y=x; y[4]=4; return x[1][1];  }'
 assert 5 'int main() { int x[2][3]; int *y=x; y[5]=5; return x[1][2];  }'
 assert 6 'int main() { int x[2][3]; int *y=x; y[6]=6; return x[2][0];  }'
 assert 2 'int main() { int x[3]; x[0]=2; x[1]=4; x[2]=5; return *x;  }'
-assert 5 'int main() { int x[5]; int i=0; int j=0;for(i=0; i<5; i=i+1){x[i]=0;} x[4]=5;j=x[4]; return j; }'
+assert 5 'int main() { int x[5]; int i=0; int j=0;for i=0; i<5; i=i+1 {x[i]=0;} x[4]=5;j=x[4]; return j; }'
 
 echo -e "\e[1;34m< sizeof >\e[0m"
 assert 8 'int main() { int x; return sizeof(x);  }'

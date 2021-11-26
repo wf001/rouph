@@ -86,12 +86,12 @@ func TokenizeHandler(arg string) *Token {
 			// return statement
 		} else if s == "return" {
 			cur = newToken(TK_KIND_RESERVED, cur, s)
+			// standard library
 		} else if _, res := startWith(s, standard_lib); res {
 			cur = newToken(TK_STDLIB, cur, s)
 			// identifier
 		} else if isAlpha(rune(s[0])) {
 			cur = newToken(TK_IDENT, cur, s)
-			// standard library
 			// string literal
 		} else if string(s[0]) == "\"" {
 			cur = newToken(TK_STR, cur, s)
