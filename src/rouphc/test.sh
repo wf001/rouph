@@ -122,6 +122,9 @@ assert 20 'int main(){if (1==0) return 10;return 20;}'
 assert 10 'int main(){int hoge=1;if (hoge) return 10;return 20;}'
 assert 30 'int main(){int hoge=2;if (hoge==0) return 10; if(hoge==1) return 20; else return 30;}'
 assert 20 'int main(){int hoge=2;if (hoge<1)return 10 ; else return 20;}'
+assert 10 'int main(){int hoge=1;if (hoge == 1) return 10 ; else if (hoge == 2) return 20; else return 30;}'
+assert 20 'int main(){int hoge=2;if (hoge == 1) return 10 ; else if (hoge == 2) return 20; else return 30;}'
+assert 30 'int main(){int hoge=3;if (hoge == 1) return 10 ; else if (hoge == 2) return 20; else return 30;}'
 
 echo -e "\e[1;34m< for >\e[0m"
 assert 55 'int main(){int i=0; int j=0; for (i=0; i=<10; i=i+1) j=i+j; return j;}'

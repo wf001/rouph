@@ -1,5 +1,4 @@
 # elif
-# print out variable
 
 # in/decrement
 # char *hoge -> string hoge
@@ -8,3 +7,4 @@
 # MOD operation
 # break, continue
 # comment
+# print out local string variable

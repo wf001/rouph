@@ -95,7 +95,7 @@ func gen(node *Node) {
 			fmt.Println("  cmp rax, 0")
 			fmt.Printf("  je .Lelse%d\n", seq)
 			gen(node.Then)
-			fmt.Printf("  je .Lend%d\n", seq)
+			fmt.Printf("  jmp .Lend%d\n", seq)
 			fmt.Printf(".Lelse%d:\n", seq)
 			gen(node.Else)
 			fmt.Printf(".Lend%d:\n", seq)
