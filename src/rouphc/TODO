@@ -1,10 +1,19 @@
-# elif
+# directive
+def, let declaration.
+type definition change int hoge to hoge:int.
+for/if statement change for/if(;;){} to for/if ;;;{}
+semi-colon removed
+change char *hoge to string hoge.
 
-# in/decrement
-# char *hoge -> string hoge
-# def support
-# Logical operation
-# MOD operation
-# break, continue
-# comment
-# print out local string variable
+# feature
+Support in/decrement op.
+Support &&, || op.
+Support break, continue statement.
+Support comment signature.
+Support local variable deflaration inner for-statement
+Support struct type
+Support bool type
+
+
+# bug
+print out string variable.
