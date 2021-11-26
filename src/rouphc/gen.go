@@ -170,14 +170,17 @@ func gen(node *Node) {
 		Info("stdlib %+v\n", node)
 		Info("stdlib %+v\n", node.Lhs)
 		if node.Lhs.Var != nil && node.Lhs.Var.isLocal {
+			fmt.Printf("  lea r10, [rsp-8]\n")
 			fmt.Printf("  mov rax, [rbp-%d]\n", node.Lhs.Var.Offset)
 			fmt.Printf("  mov rbx, 10\n")
 			fmt.Printf("  mov r8, %d\n", 0)
+            //Type identifier 0 = int
 			fmt.Printf("  mov r9, %d\n", 0)
 		} else {
 			fmt.Printf("  push offset %s\n", node.Lhs.Var.Name)
 			fmt.Printf("  mov r8, %d\n", node.Lhs.Var.ContLen-1)
 			fmt.Printf("  mov rsi, [rsp]\n")
+            //Type identifier 1 = string
 			fmt.Printf("  mov r9, %d\n", 1)
 		}
 		fmt.Printf("  call .%s\n", node.Lhs.Func)

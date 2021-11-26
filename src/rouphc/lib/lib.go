@@ -15,6 +15,7 @@ func libPuts() {
 	fmt.Printf(".put:\n")
 	fmt.Printf("  cmp r9, 1\n")
 	fmt.Printf("  je .puts\n")
+	fmt.Printf("  pop r10\n")
 	fmt.Printf("  jne .store\n")
 	fmt.Printf("  ret\n")
 
@@ -27,9 +28,8 @@ func libPuts() {
 	fmt.Printf("  cmp rax, 0\n")
 	fmt.Printf("  jnz .store\n")
 	fmt.Printf("  lea rsi, [rsp]\n")
-	fmt.Printf("  call .puti\n")
-	fmt.Printf("  lea rsp, [rbp]\n")
-	fmt.Printf("  ret\n")
+	fmt.Printf("  push r10\n")
+	fmt.Printf("  jmp .puti\n")
 
 	fmt.Printf(".puti:\n")
 	fmt.Printf("  mov rdx, 1\n")
