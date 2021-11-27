@@ -172,16 +172,7 @@ func stmt(tok *Token) (*Token, *Node) {
 		node := newNode(ND_KIND_IF, nil, nil)
 		tok = tok.Next
 
-		if tok.Val != "(" {
-			panic("( not found")
-		}
-		tok = tok.Next
 		tok, node.Cond = expr(tok)
-
-		if tok.Val != ")" {
-			panic(") not found")
-		}
-		tok = tok.Next
 		tok, node.Then = stmt(tok)
 
 		if tok.Str == "else" {
@@ -194,7 +185,6 @@ func stmt(tok *Token) (*Token, *Node) {
 	if tok.Str == "for" {
 		tok = tok.Next
 		node := newNode(ND_KIND_FOR, nil, nil)
-
 
 		if tok.Val != ";" {
 			tok, node.Init = readExprStmt(tok)
@@ -213,9 +203,9 @@ func stmt(tok *Token) (*Token, *Node) {
 		tok = tok.Next
 
 		if tok.Val != "{" {
-            tok, node.Inc = readExprStmt(tok)
-        }
-        tok, node.Then = stmt(tok)
+			tok, node.Inc = readExprStmt(tok)
+		}
+		tok, node.Then = stmt(tok)
 		return tok, node
 	}
 

@@ -116,15 +116,15 @@ assert 4 'int main(){ int al = 2; int be = 3; int ga=1;return al*be-al*ga;}'
 assert 6 'int main(){int al=2;int be=3;int ga=1;int de=5;return (de-al)*ga+be;}'
 
 echo -e "\e[1;34m< if >\e[0m"
-assert 10 'int main(){if (1) return 10;return 20;}'
-assert 20 'int main(){if (0) return 10;return 20;}'
-assert 20 'int main(){if (1==0) return 10;return 20;}'
-assert 10 'int main(){int hoge=1;if (hoge) return 10;return 20;}'
-assert 30 'int main(){int hoge=2;if (hoge==0) return 10; if(hoge==1) return 20; else return 30;}'
-assert 20 'int main(){int hoge=2;if (hoge<1)return 10 ; else return 20;}'
-assert 10 'int main(){int hoge=1;if (hoge == 1) return 10 ; else if (hoge == 2) return 20; else return 30;}'
-assert 20 'int main(){int hoge=2;if (hoge == 1) return 10 ; else if (hoge == 2) return 20; else return 30;}'
-assert 30 'int main(){int hoge=3;if (hoge == 1) return 10 ; else if (hoge == 2) return 20; else return 30;}'
+assert 10 'int main(){if 1 {return 10;return 20;}}'
+assert 20 'int main(){if 0{ return 10;}return 20;}'
+assert 20 'int main(){if 1==0 {return 10;}return 20;}'
+assert 10 'int main(){int hoge=1;if hoge {return 10;}return 20;}'
+assert 30 'int main(){int hoge=2;if hoge==0 {return 10;} else {return 30;}}'
+assert 20 'int main(){int hoge=2;if hoge<1 {return 10;}  else {return 20;}}'
+assert 10 'int main(){int hoge=1;if hoge == 1 {return 10 ;} else if hoge == 2 {return 20;} else {return 30;}}'
+assert 20 'int main(){int hoge=2;if hoge == 1 {return 10 ;} else if hoge == 2 {return 20;} else {return 30;}}'
+assert 30 'int main(){int hoge=3;if hoge == 1 {return 10 ;} else if hoge == 2 {return 20;} else {return 30;}}'
 
 echo -e "\e[1;34m< for >\e[0m"
 assert 55 'int main(){int i=0; int j=0; for i=0; i=<10; i=i+1{ j=i+j;} return j;}'
@@ -145,7 +145,7 @@ assert 10 'int main() { return myadd2(4,6); } int myadd2(int x,int y) { return x
 assert 11 'int main() { return myadd3(5,6); } int myadd3(int x,int y) { return x+y; }'
 assert 7 'int main() { return myadd4(1,6); } int myadd4(int x,int y) { return x+y; }'
 assert 17 'int main() { return myadd5(11,6); } int myadd5(int x,int y) { return x+y; }'
-assert 89 'int main(){return fib(11);} int fib(int n){if(n==1)return 1;if(n==2) return 1; return fib(n-1)+fib(n-2);}'
+assert 89 'int main(){return fib(11);} int fib(int n){if n==1 {return 1;} if n==2 {return 1;} return fib(n-1)+fib(n-2);}'
 
 echo -e "\e[1;34m< pointer >\e[0m"
 assert 3 'int main() { int x=3; return *&x;  }'
