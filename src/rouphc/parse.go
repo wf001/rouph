@@ -41,6 +41,62 @@ const (
 	ND_KIND_STDLIB                        // standard library
 )
 
+func (nk NodeKind) String() string {
+	switch nk {
+	case ND_KIND_ADD:
+		return "nk_add"
+	case ND_KIND_SUB:
+		return "nk_sub"
+	case ND_KIND_MUL:
+		return "nk_mul"
+	case ND_KIND_DIV:
+		return "nk_div"
+	case ND_KIND_REM:
+		return "nk_rem"
+	case ND_KIND_EQ:
+		return "nk_eq"
+	case ND_KIND_NE:
+		return "nk_ne"
+	case ND_KIND_LT:
+		return "nk_lt"
+	case ND_KIND_LE:
+		return "nk_le"
+	case ND_KIND_GT:
+		return "nk_gt"
+	case ND_KIND_GE:
+		return "nk_ge"
+	case ND_KIND_ASSIGN:
+		return "nk_assign"
+	case ND_KIND_ADDR:
+		return "nk_addr"
+	case ND_KIND_DEREF:
+		return "nk_deref"
+	case ND_KIND_RETURN:
+		return "nk_return"
+	case ND_KIND_IF:
+		return "nk_if"
+	case ND_KIND_FOR:
+		return "nk_for"
+	case ND_KIND_SIZEOF:
+		return "nk_sizeof"
+	case ND_KIND_BLOCK:
+		return "nk_block"
+	case ND_KIND_FUNCALL:
+		return "nk_func"
+	case ND_KIND_EXPR_STMT:
+		return "nk_expr_stmt"
+	case ND_KIND_VAR:
+		return "nk_var"
+	case ND_KIND_NUM:
+		return "nk_num"
+	case ND_KIND_NULL:
+		return "nk_null"
+	case ND_KIND_STDLIB:
+		return "nk_stdlib"
+	}
+	return "nod found"
+}
+
 type Node struct {
 	Kind NodeKind
 	Next *Node
@@ -519,26 +575,21 @@ func newNodeNum(val int) *Node {
 
 func printNode(node *Node) {
 	if DEBUG {
-		Info("##\x1b[32m node %p\x1b[0m\n", node)
+		Info("##\x1b[32m kind %s\x1b[0m\n", node.Kind)
 		switch node.Kind {
 
 		case ND_KIND_NULL:
 			return
 		case ND_KIND_NUM:
-			Info("## %+v\n", node)
-			Info("## type -> %+v\n", node.Ty)
+			Info("  ## type %+d\n", node.Val)
 			return
 		case ND_KIND_STDLIB:
-			Info("## %+v\n", node)
 			return
 		case ND_KIND_EXPR_STMT:
-			Info("## %+v\n", node)
 			printNode(node.Lhs)
 			return
 		case ND_KIND_VAR:
-			Info("## %+v\n", node)
-			Info("->### var %p\n", node.Var)
-			Info("->### var %+v\n", node.Var)
+			Info("   ## var %+v\n", node.Var)
 			return
 		case ND_KIND_ADDR:
 			printNode(node.Lhs)
@@ -553,9 +604,6 @@ func printNode(node *Node) {
 			}
 			return
 		case ND_KIND_FOR:
-			Info("## %+v\n", node)
-			Info("->### var %p\n", node.Var)
-			Info("->### var %+v\n", node.Var)
 			if node.Init != nil {
 				printNode(node.Init)
 			}
@@ -568,15 +616,11 @@ func printNode(node *Node) {
 			}
 			return
 		case ND_KIND_ASSIGN:
-			Info("## %+v\n", node)
 			printNode(node.Lhs)
 			printNode(node.Rhs)
 			return
 		case ND_KIND_IF:
 			if node.Else != nil {
-				Info("## %+v\n", node)
-				Info("## then -> %+v\n", node.Then)
-				Info("## else -> %+v\n", node.Else)
 				gen(node.Cond)
 				gen(node.Then)
 				gen(node.Else)
@@ -591,11 +635,9 @@ func printNode(node *Node) {
 			}
 			return
 		case ND_KIND_RETURN:
-			Info("## %+v\n", node)
 			printNode(node.Lhs)
 			return
 		}
-		Info("## %+v\n", node)
 		printNode(node.Lhs)
 		printNode(node.Rhs)
 	}
