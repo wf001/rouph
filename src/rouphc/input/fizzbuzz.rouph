@@ -1,21 +1,18 @@
 int main(){
-    fizzbuzz(101);
-    return 0;
+    fizzbuzz(101)
+    return 0
 }
-
-
 int fizzbuzz(int n){
-
-    int i;
+    int i
     for i=1; i<n; i=i+1 {
         if (i%15)==0 {
-            put("fizzbuzz");
+            put("fizzbuzz")
         }else if (i%5)==0 {
-            put("buzz");
+            put("buzz")
         }else if (i%3)==0 {
-            put("fizz");
+            put("fizz")
         }else{
-            put(i);
+            put(i)
         }
     }
     return 0;

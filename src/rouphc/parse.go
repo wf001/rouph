@@ -152,6 +152,10 @@ func Program(tok *Token) *Prog {
 		if tok.Kind == TK_KIND_EOF {
 			break
 		}
+        if tok.Val == "@" {
+            tok = tok.Next
+            continue
+        }
 		if token, isFunc := isFunction(tok); isFunc {
 			tok = token
 			tok, cur.Next = function(tok)
@@ -196,7 +200,7 @@ func function(tok *Token) (*Token, *Function) {
 	head.Next = nil
 	cur := head
 	for {
-		if tok.Val == "}" {
+		if tok.Val == "}"{
 			tok = tok.Next
 			break
 		}
@@ -212,13 +216,16 @@ func function(tok *Token) (*Token, *Function) {
 
 func stmt(tok *Token) (*Token, *Node) {
 	printTokenAndeNode("stmt", tok)
+	if tok.Val == "@" {
+		tok = tok.Next
+	}
 	if tok.Val == "return" {
 		tok = tok.Next
 		tok, e_node := expr(tok)
 		node := newNode(ND_KIND_RETURN, e_node, nil)
 
-		if tok.Val != ";" {
-			panic("; not found")
+		if tok.Val != "@" {
+			panic("@ not found")
 		}
 		tok = tok.Next
 		return tok, node
@@ -290,8 +297,8 @@ func stmt(tok *Token) (*Token, *Node) {
 
 	tok, node := readExprStmt(tok)
 
-	if tok.Val != ";" {
-		panic("; not found")
+	if tok.Val != "@" {
+		panic("@ not found")
 	}
 	tok = tok.Next
 	return tok, node
@@ -309,7 +316,7 @@ func declaration(tok *Token) (*Token, *Node) {
 	tok, ty = readTypeSuffix(tok, ty)
 	v := pushVar(name, ty, true)
 
-	if tok.Val == ";" {
+	if tok.Val == "@" {
 		tok = tok.Next
 		return tok, newNode(ND_KIND_NULL, nil, nil)
 	}
@@ -320,8 +327,8 @@ func declaration(tok *Token) (*Token, *Node) {
 	tok = tok.Next
 	Lhs := newVar(v)
 	tok, Rhs := expr(tok)
-	if tok.Val != ";" {
-		panic("; not found.")
+	if tok.Val != "@" {
+		panic("@ not found.")
 	}
 	tok = tok.Next
 	node := newNode(ND_KIND_ASSIGN, Lhs, Rhs)
@@ -695,6 +702,9 @@ func printTokenAndeNode(name string, tok *Token) {
 
 func baseType(tok *Token) (*Token, *Type) {
 	var ty *Type
+	if tok.Str == "@" {
+		tok = tok.Next
+	}
 
 	if tok.Str == "char" {
 		tok = tok.Next
@@ -773,6 +783,7 @@ func readTypeSuffix(tok *Token, base *Type) (*Token, *Type) {
 }
 func isFunction(tok *Token) (*Token, bool) {
 	token := tok
+    Info("isfunc %+v\n", tok)
 	tok, _ = baseType(tok)
 	isFunc := false
 	if tok.Kind == TK_IDENT {
@@ -782,6 +793,7 @@ func isFunction(tok *Token) (*Token, bool) {
 			isFunc = true
 		}
 	}
+    Info("isfunc %d\n", isFunc)
 	tok = token
 	return tok, isFunc
 
@@ -794,8 +806,8 @@ func globalVar(tok *Token) *Token {
 	name := tok.Str
 	tok = tok.Next
 	tok, ty = readTypeSuffix(tok, ty)
-	if tok.Val != ";" {
-		panic("not found ;")
+	if tok.Val != "@" {
+		panic("not found @")
 	}
 	tok = tok.Next
 	pushVar(name, ty, false)

@@ -25,7 +25,11 @@ func main() {
 		scanner := bufio.NewScanner(data)
 		var input_arr = ""
 		for scanner.Scan() {
-			input_arr += scanner.Text()
+            s := scanner.Text()
+			input_arr += s
+            if string(s[len(s)-1]) != "}"{
+                input_arr += "@"
+            }
 		}
 		arg = input_arr
 	}
