@@ -174,13 +174,13 @@ func gen(node *Node) {
 			fmt.Printf("  mov rax, [rbp-%d]\n", node.Lhs.Var.Offset)
 			fmt.Printf("  mov rbx, 10\n")
 			fmt.Printf("  mov r8, %d\n", 0)
-            //Type identifier 0 = int
+			//Type identifier 0 = int
 			fmt.Printf("  mov r9, %d\n", 0)
 		} else {
 			fmt.Printf("  push offset %s\n", node.Lhs.Var.Name)
 			fmt.Printf("  mov r8, %d\n", node.Lhs.Var.ContLen-1)
 			fmt.Printf("  mov rsi, [rsp]\n")
-            //Type identifier 1 = string
+			//Type identifier 1 = string
 			fmt.Printf("  mov r9, %d\n", 1)
 		}
 		fmt.Printf("  call .%s\n", node.Lhs.Func)

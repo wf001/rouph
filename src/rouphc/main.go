@@ -14,12 +14,12 @@ func main() {
 	s := flag.String("i", "", "")
 	flag.Parse()
 	var arg string
-    Info("%s\n", *s)
+	Info("%s\n", *s)
 
 	if *s != "" {
 		arg = *s
 	} else {
-        file := flag.Arg(0)
+		file := flag.Arg(0)
 		data, _ := os.Open(file)
 		defer data.Close()
 		scanner := bufio.NewScanner(data)
@@ -27,7 +27,7 @@ func main() {
 		for scanner.Scan() {
 			input_arr += scanner.Text()
 		}
-        arg = input_arr
+		arg = input_arr
 	}
 	Info("arg:%s\n", arg)
 	// tokenize
@@ -55,7 +55,7 @@ func main() {
 		n := fn.N
 		for ; n != nil; n = n.Next {
 			printNode(n)
-			Info("%s\n", "## [ref next]")
+			Info("%s\n", " ---------------- ")
 		}
 	}
 	Info("%s\n", "=================")
