@@ -13,6 +13,7 @@ Support local variable deflaration inner for-statement
 Support struct type
 Support bool type
 Support macro
+Support malloc
 
 
 # bug

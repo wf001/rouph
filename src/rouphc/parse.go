@@ -288,7 +288,8 @@ func stmt(tok *Token) (*Token, *Node) {
 		return tok, node
 	}
 
-	if isTypeName(tok) {
+	if tok.Str == "let" {
+		tok = tok.Next
 		return declaration(tok)
 	}
 
@@ -303,13 +304,18 @@ func stmt(tok *Token) (*Token, *Node) {
 
 func declaration(tok *Token) (*Token, *Node) {
 	printTokenAndeNode("declaration", tok)
-	tok, ty := baseType(tok)
 	if tok.Kind != TK_IDENT {
 		panic("identifier not found.")
 	}
 	name := tok.Str
 	tok = tok.Next
 
+	if tok.Val != ":" {
+		panic(": not found.")
+	}
+	tok = tok.Next
+
+	tok, ty := baseType(tok)
 	tok, ty = readTypeSuffix(tok, ty)
 	v := pushVar(name, ty, true)
 
@@ -722,12 +728,18 @@ func baseType(tok *Token) (*Token, *Type) {
 }
 
 func readFuncParam(tok *Token) (*Token, *VarList) {
-	tok, ty := baseType(tok)
 	if tok.Kind != TK_IDENT {
 		panic("not found identifier.")
 	}
 	name := tok.Str
 	tok = tok.Next
+
+	if tok.Val != ":" {
+		panic("not found :.")
+	}
+	tok = tok.Next
+
+	tok, ty := baseType(tok)
 	tok, ty = readTypeSuffix(tok, ty)
 
 	vl := new(VarList)
@@ -784,12 +796,23 @@ func isFunction(tok *Token) (*Token, bool) {
 
 }
 func globalVar(tok *Token) *Token {
-	tok, ty := baseType(tok)
+	if tok.Str != "let" {
+		panic("not found let")
+	}
+	tok = tok.Next
+
 	if tok.Kind != TK_IDENT {
 		panic("not identifier")
 	}
 	name := tok.Str
 	tok = tok.Next
+
+	if tok.Val != ":" {
+		panic("not found :")
+	}
+	tok = tok.Next
+
+	tok, ty := baseType(tok)
 	tok, ty = readTypeSuffix(tok, ty)
 	if tok.Val != ";" {
 		panic("not found ;")

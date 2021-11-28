@@ -1,11 +1,10 @@
 func main():int{
-    fizzbuzz(20);
-    return 0;
+    return fizzbuzz(20);
 }
 
 
-func fizzbuzz(int n):int{
-    int i;
+func fizzbuzz(n:int):int{
+    let i:int;
     for i=1; i<n; i=i+1 {
         if (i%15)==0 {
             put("fizzbuzz");
