@@ -173,7 +173,6 @@ func function(tok *Token) (*Token, *Function) {
 	Locals = nil
 
 	fn := new(Function)
-	tok, _ = baseType(tok)
 	if tok.Kind != TK_IDENT {
 		panic("identifier not found")
 	}
@@ -187,6 +186,11 @@ func function(tok *Token) (*Token, *Function) {
 
 	tok, fn.Params = readFuncParams(tok)
 
+	if tok.Val != ":" {
+		panic(": notfound")
+	}
+	tok = tok.Next
+	tok, _ = baseType(tok)
 	if tok.Val != "{" {
 		panic("{ not found")
 	}
@@ -694,6 +698,7 @@ func printTokenAndeNode(name string, tok *Token) {
 }
 
 func baseType(tok *Token) (*Token, *Type) {
+	printTokenAndeNode("baseType", tok)
 	var ty *Type
 
 	if tok.Str == "char" {
@@ -772,18 +777,10 @@ func readTypeSuffix(tok *Token, base *Type) (*Token, *Type) {
 	return tok, arrayOf(base, sz)
 }
 func isFunction(tok *Token) (*Token, bool) {
-	token := tok
-	tok, _ = baseType(tok)
-	isFunc := false
-	if tok.Kind == TK_IDENT {
-		tok = tok.Next
-		if tok.Val == "(" {
-			tok = tok.Next
-			isFunc = true
-		}
+	if tok.Str == "func" {
+		return tok.Next, true
 	}
-	tok = token
-	return tok, isFunc
+	return tok, false
 
 }
 func globalVar(tok *Token) *Token {

@@ -10,9 +10,9 @@ import (
 )
 
 var standard_lib = []string{"put"}
-var reserve_sig = []string{"return", "if", "else", "for", "int", "sizeof", "char"}
+var reserve_sig = []string{"return", "if", "else", "for", "func", "int", "sizeof", "char"}
 var eq_rel_op = []string{"==", "!=", ">=", "=<"}
-var op = "+-*/()><;={},&[]%"
+var op = "+-*/()><;={},&[]%:"
 
 type TokKind int
 

@@ -1,9 +1,8 @@
 # directive
 def, let declaration.
 type definition change int hoge to hoge:int.
-for/if statement change for/if(;;){} to for/if ;;;{}
-semi-colon removed
 change char *hoge to string hoge.
+semi-colon removed
 
 # feature
 Support in/decrement op.
@@ -13,6 +12,7 @@ Support comment signature.
 Support local variable deflaration inner for-statement
 Support struct type
 Support bool type
+Support macro
 
 
 # bug

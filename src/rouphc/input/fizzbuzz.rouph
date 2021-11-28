@@ -1,11 +1,10 @@
-int main(){
-    fizzbuzz(101);
+func main():int{
+    fizzbuzz(20);
     return 0;
 }
 
 
-int fizzbuzz(int n){
-
+func fizzbuzz(int n):int{
     int i;
     for i=1; i<n; i=i+1 {
         if (i%15)==0 {

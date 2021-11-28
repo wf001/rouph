@@ -1,11 +1,5 @@
-int main() {
+func main():int {
     int a = 1;
-    int b = 2;
-    int c = 3;
     put(a);
     put("a");
-    put(b);
-    put("b");
-    put(c);
-    return 0;
 }
