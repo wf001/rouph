@@ -3,6 +3,7 @@ tmp
 a.out
 test
 rouphc
+**/fizzbuzz
 
 
 *.o
