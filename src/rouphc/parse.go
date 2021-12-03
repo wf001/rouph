@@ -562,6 +562,7 @@ func pushVar(name string, ty *Type, isLocal bool) *Var {
 	v.Name = name
 	v.Ty = ty
 	v.isLocal = isLocal
+	Info("pushVar: %+v\n", v)
 
 	vl := new(VarList)
 	vl.V = v
