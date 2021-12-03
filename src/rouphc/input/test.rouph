@@ -1,5 +1,6 @@
 func main():int {
-    int a = 1;
+    let a:char* = "abc";
+    let b: int = 1;
+    put(b);
     put(a);
-    put("a");
 }

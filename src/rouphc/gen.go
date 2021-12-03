@@ -168,14 +168,29 @@ func gen(node *Node) {
 		return
 	case ND_KIND_STDLIB:
 		Info("stdlib %+v\n", node)
-		Info("stdlib %+v\n", node.Lhs)
-		if node.Lhs.Var != nil && node.Lhs.Var.isLocal {
+		Info("stdlib %+v\n", node.Lhs.Var)
+		Info("stdlib %+v\n", node.Lhs.Var.Ty)
+		Info("stdlib %+v\n", node.Lhs.Var.Ty.Base)
+		if node.Lhs.Var != nil &&
+			node.Lhs.Var.isLocal &&
+			(node.Lhs.Var.Ty.Kind != TY_PTR || node.Lhs.Var.Ty.Base.Kind != TY_CHAR) {
+
 			fmt.Printf("  lea r10, [rsp-8]\n")
 			fmt.Printf("  mov rax, [rbp-%d]\n", node.Lhs.Var.Offset)
 			fmt.Printf("  mov rbx, 10\n")
 			fmt.Printf("  mov r8, %d\n", 0)
 			//Type identifier 0 = int
 			fmt.Printf("  mov r9, %d\n", 0)
+		} else if node.Lhs.Var != nil &&
+			node.Lhs.Var.isLocal &&
+			node.Lhs.Var.Ty.Kind == TY_PTR && node.Lhs.Var.Ty.Base.Kind == TY_CHAR {
+
+			fmt.Printf("  lea r10, [rsp-8]\n")
+			fmt.Printf("  mov rax, [rbp-%d]\n", node.Lhs.Var.Offset)
+			fmt.Printf("  mov rbx, 10\n")
+			fmt.Printf("  mov r8, %d\n", 0)
+			//Type identifier 0 = int
+			fmt.Printf("  mov r9, %d\n", 2)
 		} else {
 			fmt.Printf("  push offset %s\n", node.Lhs.Var.Name)
 			fmt.Printf("  mov r8, %d\n", node.Lhs.Var.ContLen-1)
@@ -183,7 +198,9 @@ func gen(node *Node) {
 			//Type identifier 1 = string
 			fmt.Printf("  mov r9, %d\n", 1)
 		}
+		fmt.Printf("  mov r12, rsp\n")
 		fmt.Printf("  call .%s\n", node.Lhs.Func)
+		fmt.Printf("  mov rsp, r12\n")
 		return
 	}
 	gen(node.Lhs)
