@@ -25,10 +25,10 @@ func libPuts() {
 	fmt.Printf("  mov rdx, [rax]\n")
 	fmt.Printf("  inc r8\n")
 	fmt.Printf("  add rax, 1\n")
+	fmt.Printf("  and rdx, 0xff\n")
 	fmt.Printf("  cmp rdx, 0\n")
 	fmt.Printf("  jnz .store_local_string\n")
 	fmt.Printf("  dec r8\n")
-	fmt.Printf("  mov rsi, [rsp]\n")
 	fmt.Printf("  push r10\n")
 	fmt.Printf("  jmp .put_local_string\n")
 
@@ -93,5 +93,6 @@ func libPuts() {
 	fmt.Printf("  syscall\n")
 	fmt.Printf("  pop rax\n")
 	fmt.Printf("  mov rax, 1\n")
+	fmt.Printf("  sub r12, 8\n")
 	fmt.Printf("  ret\n")
 }

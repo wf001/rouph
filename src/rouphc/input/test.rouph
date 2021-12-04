@@ -1,6 +1,4 @@
 func main():int {
-    let a:char* = "abc";
-    let b: int = 1;
-    put(b);
+    let a: char* = "d";
     put(a);
 }
