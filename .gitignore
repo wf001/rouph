@@ -1,15 +1,16 @@
+.gdb_history
+peda-session*
+
 bin/*
 tmp
 a.out
 test
-rouphc
-**/fizzbuzz
+out
+fizzbuzz
 
+rouphc
 
 *.o
 *.asm
 *.s
 
-.gdb_history
-peda-session*
-out
