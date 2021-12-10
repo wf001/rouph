@@ -7,8 +7,9 @@ a.out
 test
 out
 fizzbuzz
-
-rouphc
+./rouphc
+src/rouphc/rouphc
+res
 
 *.o
 *.asm
