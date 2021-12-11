@@ -63,6 +63,8 @@ assert_input 'cat expected/imms-vnum-imms' 'func main():int{put("abc");let a:int
 assert_input 'cat expected/vnum' 'func main():int{let a:int=1;put(a);}'
 assert_input 'cat expected/vs' 'func main():int{let a:char*="abc";put(a);}'
 assert_input 'cat expected/vs-imms' 'func main():int{let a:char*="abc";put(a);put("hoge");}'
+assert_input 'cat expected/vs-vnum' 'func main():int{let a:char*="abc";put(a);let b:int = 13; put(b);}'
+assert_input 'cat expected/vnum-vs' 'func main():int{let b:int=13;put(b); let a:char*="abc";put(a);}'
 assert_input 'cat expected/imms-vs' 'func main():int{put("hoge");let a:char*="abc";put(a);}'
 assert_input 'cat expected/imms-vs-vnum' 'func main():int{put("hoge");let a:char*="abc";let b:int=13;put(a);put(b);}'
 assert_input 'cat expected/imms-vs-vnum' 'func main():int{put("hoge");let a:char*="abc";put(a);let b:int=13;put(b);}'
