@@ -1,7 +1,5 @@
 func main():int {
-    let b:int = 13;
-    put(b);
-    let a: char* = "abc";
-    put(a);
-    put("hoge");
+    let a:int =10;
+    let b:int =20;
+    let c:int =30;
 }

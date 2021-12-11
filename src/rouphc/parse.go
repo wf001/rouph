@@ -592,7 +592,7 @@ func printNode(node *Node) {
 		case ND_KIND_NULL:
 			return
 		case ND_KIND_NUM:
-			Info("  ## type %+d\n", node.Val)
+			Info("  ## type %+v\n", node.Val)
 			return
 		case ND_KIND_STDLIB:
 			return
@@ -601,6 +601,7 @@ func printNode(node *Node) {
 			return
 		case ND_KIND_VAR:
 			Info("   ## var %+v\n", node.Var)
+			Info("   ## var.ty %+v\n", node.Var.Ty)
 			return
 		case ND_KIND_ADDR:
 			printNode(node.Lhs)

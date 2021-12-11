@@ -48,6 +48,7 @@ func main() {
 			v.Offset = offset
 		}
 		fn.StackSize = alignTo(offset, 8)
+        Info("%d\n",fn.StackSize);
 	}
 
 	Info("%s\n", "======== print node =========")

@@ -8,6 +8,19 @@ const (
 	TY_PTR
 	TY_ARRAY
 )
+func (tk TypeKind) String() string {
+	switch tk {
+	case TY_CHAR:
+		return "char"
+	case TY_INT:
+		return "int"
+	case TY_PTR:
+		return "ptr"
+	case TY_ARRAY:
+		return "array"
+    }
+	return "not found"
+}
 
 type Type struct {
 	Kind      TypeKind

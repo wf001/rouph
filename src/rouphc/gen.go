@@ -196,7 +196,7 @@ func gen(node *Node) {
 			//Type identifier 2 = local string
 			fmt.Printf("  mov r9, %d\n", 2)
 			fmt.Printf("  mov r12, rsp\n")
-			fmt.Printf("  mov rsi, [rsp]\n")
+			fmt.Printf("  mov rsi, [rbp-%d]\n", node.Lhs.Var.Offset)
 			fmt.Printf("  call .%s\n", node.Lhs.Func)
 			fmt.Printf("  mov rsp, r12\n")
 			fmt.Printf("  sub rsp, 8\n")
