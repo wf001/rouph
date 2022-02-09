@@ -1,20 +1,28 @@
 # directive
-def, let declaration.
-type definition change int hoge to hoge:int.
 change char *hoge to string hoge.
-semi-colon removed
-
-# feature
-Support in/decrement op.
-Support &&, || op.
-Support break, continue statement.
-Support comment signature.
-Support local variable deflaration inner for-statement
 Support struct type
 Support bool type
+Support signed int32 type
+
+
+# feature
+Support break, continue statement.
+Support comment signature.
 Support macro
+
+Support in/decrement op.
+Support &&, || op.
+Support local variable deflaration inner for-statement
 Support malloc
+semi-colon removed
 
 
 # bug
-print out string variable.
+
+
+
+# Release
+Document
+CI/CD pipeline
+Status Badge(README)
+
