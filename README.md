@@ -11,7 +11,11 @@ To compile from source, you need Go1.15 or later runtime. After Go environment s
 
 ```
 git clone https://github.com/wf001/rouph.git
+```
+```
 cd rouph
+```
+```
 make
 ```
 
@@ -19,9 +23,15 @@ To use docker, run the following command.
 
 ```
 git clone https://github.com/wf001/rouph.git
+```
+```
 cd rouph
-docker build -t .
-docker run -name rouph-test <image_name> -ti
+```
+```
+docker build -t rouph:latest .
+```
+```
+docker run -ti rouph:latest
 ```
 
 # Usage
