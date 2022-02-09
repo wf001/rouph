@@ -38,14 +38,25 @@ docker run -ti rouph:latest
 To compile `rouph` source code, you must provide the command as following.
 
 ```
+# build only
+rouph build test.rouph
+# build and execute immediately
 rouph run test.rouph
 ```
-Sample Rouph source code are also placed on `sample`. If you want to build sample/add1.rouph, provide the command as following,
+Sample Rouph source code are also placed on `sample`. If you want to build sample/hello-world.rouph, provide the command as following,
 
 ```
-rouph run add1.rouph
+rouph build sample/hello-world.rouph
+```
+```
+./hello-world.rouph
 ```
 
+If you want to build and run sample/hello-world.rouph, provide the command as following,
+
+```
+rouph run sample/hello-world.rouph
+```
 # Specification
 Language specification is defined on [SPEC.md](https://github.com/wf001/crude-lang-go/blob/main/SPEC.md)
 

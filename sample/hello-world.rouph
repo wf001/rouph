@@ -1,0 +1,4 @@
+func main():int {
+    put("Hello, World!");
+    return 0;
+}
