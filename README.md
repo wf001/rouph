@@ -2,7 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/wf001/rouph)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/wf001/rouph)
 ![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/wf001/rouph?filename=src%2Frouphc%2Fgo.mod)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/wf001/rouph/build-and-testing)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/wf001/rouph/go.yaml?branch=main)
 
 Rouph is an open source programming language, made with reference to [rui314/chibicc](https://github.com/rui314/chibicc/tree/reference) and [here](https://www.sigbus.info/compilerbook).
 
